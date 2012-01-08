@@ -1,18 +1,34 @@
 Source: libmp3splt
 Priority: optional
-Maintainer: Ryan Niebur <ryanryan52@gmail.com>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Ryan Niebur <ryanryan52@gmail.com>
 DM-Upload-Allowed: yes
-Build-Depends: debhelper (>= 7.0.50), gawk, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libpcre3-dev
-Standards-Version: 3.9.1
+Build-Depends: debhelper (>= 7.2),
+               gawk,
+               libid3tag0-dev,
+               libltdl3-dev,
+               libmad0-dev,
+               libogg-dev,
+               libpcre3-dev,
+               libvorbis-dev
+Standards-Version: 3.8.1
 Section: libs
 Homepage: http://mp3splt.sourceforge.net/
+Vcs-Git: git://git.ryan52.info/git/libmp3splt
+Vcs-Browser: http://git.ryan52.info/?p=libmp3splt;a=summary
 
 Package: libmp3splt-dev
 Section: libdevel
 Architecture: any
 Conflicts: libmp3splt
 Replaces: libmp3splt
-Depends: libmp3splt0 (= ${binary:Version}), ${misc:Depends}, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libpcre3-dev
+Depends: libid3tag0-dev,
+         libltdl3-dev,
+         libmad0-dev,
+         libmp3splt0 (= ${binary:Version}),
+         libogg-dev,
+         libvorbis-dev,
+         ${misc:Depends}
 Description: development files for libmp3splt0
  Mp3Splt-project is a utility to split mp3 and ogg files selecting a
  begin and an end time position, without decoding. It's very useful to
@@ -29,12 +45,12 @@ Description: development files for libmp3splt0
  This package contains the files needed to build programs against
  libmp3splt.
 
-Package: libmp3splt0-ogg
+Package: libmp3splt-ogg
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, libmp3splt0 (= ${binary:Version})
+Depends: libmp3splt0 (= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
 Conflicts: libmp3splt
 Replaces: libmp3splt
-Provides: libmp3splt-plugin, libmp3splt-plugin-ogg
+Provides: libmp3splt-plugin
 Description: Ogg Vorbis plugin for mp3splt
  Mp3Splt-project is a utility to split mp3 and ogg files selecting a
  begin and an end time position, without decoding. It's very useful to
@@ -50,12 +66,12 @@ Description: Ogg Vorbis plugin for mp3splt
  .
  This package contains the Ogg Vorbis plugin.
 
-Package: libmp3splt0-mp3
+Package: libmp3splt-mp3
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, libmp3splt0 (= ${binary:Version}), 
+Depends: libmp3splt0 (= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
 Conflicts: libmp3splt
 Replaces: libmp3splt
-Provides: libmp3splt-plugin, libmp3splt-plugin-mp3
+Provides: libmp3splt-plugin
 Description: MP3 plugin for mp3splt
  Mp3Splt-project is a utility to split mp3 and ogg files selecting a
  begin and an end time position, without decoding. It's very useful to
@@ -73,8 +89,8 @@ Description: MP3 plugin for mp3splt
 
 Package: libmp3splt0
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Recommends: libmp3splt0-mp3, libmp3splt0-ogg
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Recommends: libmp3splt-mp3, libmp3splt-ogg
 Suggests: mp3splt, mp3splt-gtk
 Conflicts: libmp3splt
 Replaces: libmp3splt
