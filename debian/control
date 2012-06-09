@@ -1,34 +1,20 @@
 Source: libmp3splt
 Priority: optional
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-XSBC-Original-Maintainer: Ryan Niebur <ryanryan52@gmail.com>
-DM-Upload-Allowed: yes
-Build-Depends: debhelper (>= 7.2),
-               gawk,
-               libid3tag0-dev,
-               libltdl3-dev,
-               libmad0-dev,
-               libogg-dev,
-               libpcre3-dev,
-               libvorbis-dev
-Standards-Version: 3.8.1
+Maintainer: Ryan Niebur <ryan@debian.org>
+Build-Depends: debhelper (>= 7.0.50), libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libpcre3-dev
+Standards-Version: 3.9.3
 Section: libs
 Homepage: http://mp3splt.sourceforge.net/
-Vcs-Git: git://git.ryan52.info/git/libmp3splt
-Vcs-Browser: http://git.ryan52.info/?p=libmp3splt;a=summary
+Vcs-Git: git://anonscm.debian.org/collab-maint/libmp3splt.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/libmp3splt.git;a=summary
+X-Soname-Version: 0
 
 Package: libmp3splt-dev
 Section: libdevel
 Architecture: any
-Conflicts: libmp3splt
-Replaces: libmp3splt
-Depends: libid3tag0-dev,
-         libltdl3-dev,
-         libmad0-dev,
-         libmp3splt0 (= ${binary:Version}),
-         libogg-dev,
-         libvorbis-dev,
-         ${misc:Depends}
+Conflicts: libmp3splt, libmp3splt-mp3, libmp3splt-ogg
+Replaces: libmp3splt, libmp3splt-mp3, libmp3splt-ogg
+Depends: libmp3splt0 (= ${binary:Version}), ${misc:Depends}, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev
 Description: development files for libmp3splt0
  Mp3Splt-project is a utility to split mp3 and ogg files selecting a
  begin and an end time position, without decoding. It's very useful to
@@ -45,12 +31,12 @@ Description: development files for libmp3splt0
  This package contains the files needed to build programs against
  libmp3splt.
 
-Package: libmp3splt-ogg
+Package: libmp3splt0-ogg
 Architecture: any
-Depends: libmp3splt0 (= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
-Conflicts: libmp3splt
-Replaces: libmp3splt
-Provides: libmp3splt-plugin
+Depends: libmp3splt0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libmp3splt, libmp3splt-ogg
+Replaces: libmp3splt, libmp3splt-ogg
+Provides: libmp3splt0-plugin
 Description: Ogg Vorbis plugin for mp3splt
  Mp3Splt-project is a utility to split mp3 and ogg files selecting a
  begin and an end time position, without decoding. It's very useful to
@@ -66,12 +52,12 @@ Description: Ogg Vorbis plugin for mp3splt
  .
  This package contains the Ogg Vorbis plugin.
 
-Package: libmp3splt-mp3
+Package: libmp3splt0-mp3
 Architecture: any
-Depends: libmp3splt0 (= ${binary:Version}), ${misc:Depends}, ${shlibs:Depends}
-Conflicts: libmp3splt
-Replaces: libmp3splt
-Provides: libmp3splt-plugin
+Depends: libmp3splt0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libmp3splt, libmp3splt-mp3
+Replaces: libmp3splt, libmp3splt-mp3
+Provides: libmp3splt0-plugin
 Description: MP3 plugin for mp3splt
  Mp3Splt-project is a utility to split mp3 and ogg files selecting a
  begin and an end time position, without decoding. It's very useful to
@@ -89,10 +75,10 @@ Description: MP3 plugin for mp3splt
 
 Package: libmp3splt0
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Recommends: libmp3splt-mp3, libmp3splt-ogg
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: mp3splt, mp3splt-gtk
 Conflicts: libmp3splt
+Breaks: mp3splt (= 2.4.2-1), mp3splt-gtk (= 0.7.2-1)
 Replaces: libmp3splt
 Description: library for splitting MP3 and Ogg Vorbis files
  Mp3Splt-project is a utility to split mp3 and ogg files selecting a
@@ -109,3 +95,4 @@ Description: library for splitting MP3 and Ogg Vorbis files
  .
  This package contains the library needed to run programs that use
  libmp3splt, such as mp3splt and mp3splt-gtk.
+

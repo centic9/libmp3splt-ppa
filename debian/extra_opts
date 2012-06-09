@@ -1,0 +1,23 @@
+#!/bin/sh
+
+SRC=$(dpkg-parsechangelog | awk '/^Source: /{print $2}')
+sed '/^$/,$ d' ../libmp3splt/debian/control | while read field value; do field=LIBMP3SPLT_$(echo $field | sed 's/:$//' | awk '{print toupper($0);}' | sed 's/-/_/g'); value=$(echo $value | sed "s/libmp3splt/$SRC/g"); echo -n "$field=\"$value\" "; done
+OTHER_PACKAGE=mp3splt
+if [ "$SRC" = "$OTHER_PACKAGE" ]; then
+    OTHER_PACKAGE=mp3splt-gtk
+fi
+echo -n "PACKAGE_NAME=$SRC "
+echo -n "PRIORITY=optional "
+echo -n "SECTION=sound "
+echo -n "OTHER_PACKAGE=$OTHER_PACKAGE "
+LONG=$LONG_INTERFACE
+SHORT=$SHORT_INTERFACE
+if [ -z "$LONG" -a -n "$SHORT" ]; then
+    LONG=$SHORT
+fi
+if [ -n "$LONG" -a -z "$SHORT" ]; then
+    SHORT=$LONG
+fi
+echo -n "LONG_INTERFACE=\"$LONG\" "
+echo -n "SHORT_INTERFACE=\"$SHORT\" "
+echo

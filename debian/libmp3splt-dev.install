@@ -1,4 +1,6 @@
 usr/include/*
 usr/lib/lib*.a
-usr/lib/lib*.so
 usr/lib/libmp3splt/lib*.a
+usr/lib/lib*.so
+debian/mp3splt.rules usr/share/libmp3splt-dev/
+usr/lib/libmp3splt/lib*.so

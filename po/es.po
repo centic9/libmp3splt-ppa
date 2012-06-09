@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mp3splt-gtk\n"
 "Report-Msgid-Bugs-To: io_fx@yahoo.fr\n"
-"POT-Creation-Date: 2011-11-14 00:12+0100\n"
+"POT-Creation-Date: 2012-05-13 00:31+0200\n"
 "PO-Revision-Date: 2011-02-22 00:08+0000\n"
 "Last-Translator: nemecis1000 <nemecis000@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,6 +37,12 @@ msgstr ""
 msgid ""
 " Working with SILENCE AUTO-ADJUST (Threshold: %.1f dB Gap: %d sec Offset: "
 "%.2f)\n"
+msgstr ""
+
+#: src/mp3splt.c:1734 src/tags_parser.c:108
+msgid ""
+" warning: cannot set tags from filename regular expression - compiled "
+"without pcre support\n"
 msgstr ""
 
 #: src/checks.c:158
@@ -88,64 +94,64 @@ msgstr ""
 msgid " Trim silence split - Th: %.1f dB\n"
 msgstr ""
 
-#: src/splt.c:739
+#: src/splt.c:746
 #, c-format
 msgid "YES"
 msgstr "SÍ"
 
-#: src/splt.c:743
+#: src/splt.c:750
 #, c-format
 msgid "NO"
 msgstr "NO"
 
-#: src/splt.c:749
+#: src/splt.c:756
 #, c-format
 msgid "User"
 msgstr "Usuario"
 
-#: src/splt.c:753
+#: src/splt.c:760
 #, c-format
 msgid "Auto"
 msgstr "Auto"
 
-#: src/splt.c:759
+#: src/splt.c:766
 #, c-format
 msgid ""
 " Silence split type: %s mode (Th: %.1f dB, Off: %.2f, Min: %.2f, Remove: %s, "
-"Min track: %.2f)\n"
+"Min track: %.2f, Shots: %d)\n"
 msgstr ""
 
-#: src/splt.c:778
+#: src/splt.c:786
 #, c-format
 msgid ""
 " Found silence log file '%s' ! Reading silence points from file to save "
 "time ;)\n"
 msgstr ""
 
-#: src/splt.c:807
+#: src/splt.c:815
 #, c-format
 msgid " Total silence points found: %d."
 msgstr ""
 
-#: src/splt.c:819
+#: src/splt.c:827
 #, c-format
 msgid " (Selected %d tracks)\n"
 msgstr ""
 
-#: src/splt.c:929
+#: src/splt.c:937
 #, c-format
 msgid " Writing silence log file '%s' ...\n"
 msgstr ""
 
-#: src/splt.c:984
+#: src/splt.c:993
 msgid " info: starting silence mode split\n"
 msgstr ""
 
-#: src/splt.c:1032
+#: src/splt.c:1041
 msgid " info: starting trim using silence mode split\n"
 msgstr ""
 
-#: src/splt.c:1079
+#: src/splt.c:1088
 msgid " info: starting wrap mode split\n"
 msgstr ""
 
@@ -529,10 +535,14 @@ msgid " regular expression error: %s"
 msgstr ""
 
 #: src/errors.c:435
-msgid " regular expression error: no match"
+msgid " regular expressions are not supported"
 msgstr ""
 
 #: src/errors.c:437
+msgid " regular expression error: no match"
+msgstr ""
+
+#: src/errors.c:439
 msgid " regular expression ok"
 msgstr ""
 
@@ -544,73 +554,73 @@ msgstr ""
 msgid "not enough memory"
 msgstr ""
 
-#: src/tags_parser.c:108
+#: plugins/mp3.c:1158
 msgid ""
-" warning: cannot set tags from filename regular expression - compiled "
-"without pcre support\n"
+" warning: lost sync and compiled without id3tag support - the split might be "
+"corrupt\n"
 msgstr ""
 
-#: plugins/mp3.c:1242
+#: plugins/mp3.c:1254
 msgid " info: found Xing or Info header. Switching to frame mode... \n"
-msgstr ""
-
-#: plugins/mp3.c:1381
-#, c-format
-msgid " info: MPEG %d Layer %d - %d Hz - %s"
-msgstr ""
-
-#: plugins/mp3.c:1389
-#, c-format
-msgid " - FRAME MODE NS"
 msgstr ""
 
 #: plugins/mp3.c:1393
 #, c-format
+msgid " info: MPEG %d Layer %d - %d Hz - %s"
+msgstr ""
+
+#: plugins/mp3.c:1401
+#, c-format
+msgid " - FRAME MODE NS"
+msgstr ""
+
+#: plugins/mp3.c:1405
+#, c-format
 msgid " - FRAME MODE"
 msgstr ""
 
-#: plugins/mp3.c:1398
+#: plugins/mp3.c:1410
 #, c-format
 msgid " - NS - %d Kb/s"
 msgstr ""
 
-#: plugins/mp3.c:1403
+#: plugins/mp3.c:1415
 #, c-format
 msgid " - %d Kb/s"
 msgstr ""
 
-#: plugins/mp3.c:1411 plugins/ogg.c:134
+#: plugins/mp3.c:1423 plugins/ogg.c:134
 #, c-format
 msgid " - Total time: %dm.%02ds"
 msgstr ""
 
-#: plugins/mp3.c:2724
+#: plugins/mp3.c:2737
 #, c-format
 msgid " Detected file created with: Mp3Wrap v. %c.%c\n"
 msgstr ""
 
-#: plugins/mp3.c:2762
+#: plugins/mp3.c:2775
 msgid " Check for file integrity: calculating CRC please wait... "
 msgstr ""
 
-#: plugins/mp3.c:2781
+#: plugins/mp3.c:2794
 msgid " OK\n"
 msgstr ""
 
-#: plugins/mp3.c:2800
+#: plugins/mp3.c:2813
 msgid " Detected file created with: AlbumWrap\n"
 msgstr ""
 
-#: plugins/mp3.c:2822
+#: plugins/mp3.c:2835
 #, c-format
 msgid " Total files: %d\n"
 msgstr ""
 
-#: plugins/mp3.c:3238
+#: plugins/mp3.c:3251
 msgid " warning: stdin '-' is supposed to be mp3 stream.\n"
 msgstr ""
 
-#: plugins/mp3.c:3265
+#: plugins/mp3.c:3278
 #, c-format
 msgid " Processed %lu frames - Sync errors: %lu\n"
 msgstr ""
@@ -620,6 +630,6 @@ msgstr ""
 msgid " info: Ogg Vorbis Stream - %ld - %ld Kb/s - %d channels"
 msgstr ""
 
-#: plugins/ogg.c:1458
+#: plugins/ogg.c:1457
 msgid " warning: stdin 'o-' is supposed to be ogg stream.\n"
 msgstr ""

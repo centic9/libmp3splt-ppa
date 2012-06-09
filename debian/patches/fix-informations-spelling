@@ -1,0 +1,233 @@
+Description: fix spelling of informations to be information
+Author: Ryan Niebur <ryan@debian.org>
+Forwarded: no
+
+Index: libmp3splt/po/cs.po
+===================================================================
+--- libmp3splt.orig/po/cs.po	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/po/cs.po	2012-06-02 23:44:18.000000000 -0700
+@@ -54,7 +54,7 @@
+ 
+ #: src/cddb.c:63
+ #, c-format
+-msgid " reading informations from CDDB file %s ...\n"
++msgid " reading information from CDDB file %s ...\n"
+ msgstr " Čtou se informace ze souboru CDDB %s …\n"
+ 
+ #: src/cddb.c:125 src/cue.c:539
+@@ -175,7 +175,7 @@
+ 
+ #: src/cue.c:435
+ #, c-format
+-msgid " reading informations from CUE file %s ...\n"
++msgid " reading information from CUE file %s ...\n"
+ msgstr " Čtou se informace ze souboru CUE %s …\n"
+ 
+ #: src/cue.c:487
+@@ -189,7 +189,7 @@
+ 
+ #: src/audacity.c:237
+ #, c-format
+-msgid " reading informations from audacity labels file '%s' ...\n"
++msgid " reading information from audacity labels file '%s' ...\n"
+ msgstr " Čtou se informace ze souboru se štítky Audacity '%s …\n"
+ 
+ #: src/errors.c:129
+Index: libmp3splt/po/de_DE.po
+===================================================================
+--- libmp3splt.orig/po/de_DE.po	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/po/de_DE.po	2012-06-02 23:44:18.000000000 -0700
+@@ -55,7 +55,7 @@
+ 
+ #: src/cddb.c:63
+ #, c-format
+-msgid " reading informations from CDDB file %s ...\n"
++msgid " reading information from CDDB file %s ...\n"
+ msgstr " Informationen aus CDDB-Datei %s werden gelesen …\n"
+ 
+ #: src/cddb.c:125 src/cue.c:539
+@@ -174,7 +174,7 @@
+ 
+ #: src/cue.c:435
+ #, c-format
+-msgid " reading informations from CUE file %s ...\n"
++msgid " reading information from CUE file %s ...\n"
+ msgstr " Informationen aus CUE-Datei %s werden gelesen …\n"
+ 
+ #: src/cue.c:487
+@@ -188,7 +188,7 @@
+ 
+ #: src/audacity.c:237
+ #, c-format
+-msgid " reading informations from audacity labels file '%s' ...\n"
++msgid " reading information from audacity labels file '%s' ...\n"
+ msgstr " Informationen aus Audacity-Labels-Datei »%s« werden gelesen …\n"
+ 
+ #: src/errors.c:129
+Index: libmp3splt/po/es.po
+===================================================================
+--- libmp3splt.orig/po/es.po	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/po/es.po	2012-06-02 23:44:18.000000000 -0700
+@@ -51,7 +51,7 @@
+ 
+ #: src/cddb.c:63
+ #, c-format
+-msgid " reading informations from CDDB file %s ...\n"
++msgid " reading information from CDDB file %s ...\n"
+ msgstr ""
+ 
+ #: src/cddb.c:125 src/cue.c:539
+@@ -162,7 +162,7 @@
+ 
+ #: src/cue.c:435
+ #, c-format
+-msgid " reading informations from CUE file %s ...\n"
++msgid " reading information from CUE file %s ...\n"
+ msgstr ""
+ 
+ #: src/cue.c:487
+@@ -176,7 +176,7 @@
+ 
+ #: src/audacity.c:237
+ #, c-format
+-msgid " reading informations from audacity labels file '%s' ...\n"
++msgid " reading information from audacity labels file '%s' ...\n"
+ msgstr ""
+ 
+ #: src/errors.c:129
+Index: libmp3splt/po/fr_FR.po
+===================================================================
+--- libmp3splt.orig/po/fr_FR.po	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/po/fr_FR.po	2012-06-02 23:44:18.000000000 -0700
+@@ -55,8 +55,8 @@
+ 
+ #: src/cddb.c:63
+ #, c-format
+-msgid " reading informations from CDDB file %s ...\n"
++msgid " reading information from CDDB file %s ...\n"
+ msgstr " lecture des informations du fichier CDDB %s ...\n"
+ 
+ #: src/cddb.c:125 src/cue.c:539
+ #, c-format
+@@ -176,8 +176,8 @@
+ 
+ #: src/cue.c:435
+ #, c-format
+-msgid " reading informations from CUE file %s ...\n"
++msgid " reading information from CUE file %s ...\n"
+ msgstr " lecture des informations du fichier CUE %s ...\n"
+ 
+ #: src/cue.c:487
+ msgid "description here"
+@@ -190,9 +190,9 @@
+ 
+ #: src/audacity.c:237
+ #, c-format
+-msgid " reading informations from audacity labels file '%s' ...\n"
++msgid " reading information from audacity labels file '%s' ...\n"
+ msgstr ""
+ " Lecture des informations dans le fichier marqueurs audacity '%s' ...\n"
+ 
+ #: src/errors.c:129
+ msgid "Network error"
+Index: libmp3splt/po/hr.po
+===================================================================
+--- libmp3splt.orig/po/hr.po	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/po/hr.po	2012-06-02 23:44:18.000000000 -0700
+@@ -53,7 +53,7 @@
+ 
+ #: src/cddb.c:63
+ #, c-format
+-msgid " reading informations from CDDB file %s ...\n"
++msgid " reading information from CDDB file %s ...\n"
+ msgstr " čitanje informacija iz CDDB datoteke %s ...\n"
+ 
+ #: src/cddb.c:125 src/cue.c:539
+@@ -172,7 +172,7 @@
+ 
+ #: src/cue.c:435
+ #, c-format
+-msgid " reading informations from CUE file %s ...\n"
++msgid " reading information from CUE file %s ...\n"
+ msgstr ""
+ 
+ #: src/cue.c:487
+@@ -186,7 +186,7 @@
+ 
+ #: src/audacity.c:237
+ #, c-format
+-msgid " reading informations from audacity labels file '%s' ...\n"
++msgid " reading information from audacity labels file '%s' ...\n"
+ msgstr ""
+ 
+ #: src/errors.c:129
+Index: libmp3splt/po/libmp3splt.pot
+===================================================================
+--- libmp3splt.orig/po/libmp3splt.pot	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/po/libmp3splt.pot	2012-06-02 23:44:18.000000000 -0700
+@@ -51,7 +51,7 @@
+ 
+ #: src/cddb.c:63
+ #, c-format
+-msgid " reading informations from CDDB file %s ...\n"
++msgid " reading information from CDDB file %s ...\n"
+ msgstr ""
+ 
+ #: src/cddb.c:125 src/cue.c:539
+@@ -162,7 +162,7 @@
+ 
+ #: src/cue.c:435
+ #, c-format
+-msgid " reading informations from CUE file %s ...\n"
++msgid " reading information from CUE file %s ...\n"
+ msgstr ""
+ 
+ #: src/cue.c:487
+@@ -176,7 +176,7 @@
+ 
+ #: src/audacity.c:237
+ #, c-format
+-msgid " reading informations from audacity labels file '%s' ...\n"
++msgid " reading information from audacity labels file '%s' ...\n"
+ msgstr ""
+ 
+ #: src/errors.c:129
+Index: libmp3splt/src/audacity.c
+===================================================================
+--- libmp3splt.orig/src/audacity.c	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/src/audacity.c	2012-06-02 23:44:18.000000000 -0700
+@@ -234,7 +234,7 @@
+   *error = SPLT_AUDACITY_OK;
+ 
+   splt_c_put_info_message_to_client(state, 
+-      _(" reading informations from audacity labels file '%s' ...\n"), file);
++      _(" reading information from audacity labels file '%s' ...\n"), file);
+ 
+ 	FILE *file_input = NULL;
+ 
+Index: libmp3splt/src/cddb.c
+===================================================================
+--- libmp3splt.orig/src/cddb.c	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/src/cddb.c	2012-06-02 23:44:18.000000000 -0700
+@@ -60,7 +60,7 @@
+   }
+ 
+   splt_c_put_info_message_to_client(state, 
+-      _(" reading informations from CDDB file %s ...\n"),file);
++      _(" reading information from CDDB file %s ...\n"),file);
+ 
+   splt_t_free_splitpoints_tags(state);
+ 
+Index: libmp3splt/src/cue.c
+===================================================================
+--- libmp3splt.orig/src/cue.c	2012-06-02 23:44:03.000000000 -0700
++++ libmp3splt/src/cue.c	2012-06-02 23:44:18.000000000 -0700
+@@ -432,7 +432,7 @@
+   }
+ 
+   splt_c_put_info_message_to_client(state, 
+-      _(" reading informations from CUE file %s ...\n"),file);
++      _(" reading information from CUE file %s ...\n"),file);
+ 
+   splt_t_free_splitpoints_tags(state);
+ 

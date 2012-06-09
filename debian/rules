@@ -1,11 +1,13 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
+PACKAGE_TYPE=libmp3splt
+
+include debian/mp3splt.rules
+
 override_dh_makeshlibs:
-	dh_makeshlibs -Nlibmp3splt0 -n
-	dh_makeshlibs -plibmp3splt0 -V "$(shell sh ./debian/shlibs-string.sh)"
+	dh_makeshlibs -Nlibmp3splt$(SONAME) -n
+	dh_makeshlibs -plibmp3splt$(SONAME) -V "$(shell sh ./debian/shlibs-string.sh)"
 
 .PHONY: override_dh_makeshlibs
 
-%:
-	dh $@

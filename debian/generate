@@ -5,16 +5,25 @@
 
 set -e
 
-cp $1 $1.bak
-echo cp $1.base $1
-cp $1.base $1
-FILE=$1
+if [ -f debian/control ]; then
+    cp debian/control debian/control.bak
+fi
+echo cp $1 debian/control
+cp $1 debian/control
+FILE=debian/control
 shift
 
-while [ -n "$1" ]; do
-    KEY=$(echo "$1" | awk -F= '{print $1}')
-    VAL=$(echo "$1" | awk "{sub(\"$KEY=\", \"\", \$0); print}")
+process(){
+    KEY=$(echo "$1" | head -1 | cut -d = -f 1)
+    VAL=$(echo "$1" | head -1 | cut -d = -f 2-; echo "$1" | sed -n '2,$ p')
+    VAL=$(echo "$VAL" | sed 's/\//\\\//g' | sed 's/&/\\\&/')
+    VAL=$(echo -n "$VAL" | tr '\n' '$' | sed 's/\$/\\n/g')
     echo sed -i "s/###$KEY###/$VAL/g" $FILE
     sed -i "s/###$KEY###/$VAL/g" $FILE
+}
+
+while [ -n "$1" ]; do
+    process "$1"
     shift
 done
+process "DESCRIPTION=$(cat `dirname $0`/description)"

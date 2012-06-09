@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2011 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
  *
  * http://mp3splt.sourceforge.net
  *
@@ -493,6 +493,10 @@ typedef enum {
  * @brief Default value for the #SPLT_OPT_PARAM_NUMBER_TRACKS option
  */
 #define SPLT_DEFAULT_PARAM_TRACKS 0
+/**
+ * @brief Default value for the #SPLT_OPT_PARAM_SHOTS option
+ */
+#define SPLT_DEFAULT_PARAM_SHOTS 25
 
 /**
  * @brief Values for the #SPLT_OPT_TAGS option
@@ -632,6 +636,13 @@ typedef struct {
   tracks are split)
   */
   int parameter_number_tracks;
+  /*!
+     this option defines the number of shots to be found after the silence.
+     Decrease this value if you need to split files having closer silence points.
+
+     (positive integer number; default is #SPLT_DEFAULT_PARAM_SHOTS)
+  */
+  int parameter_shots;
   /*! The minimum silence length for option_silence_mode [in seconds]
     
     A positive float of the minimum number of seconds to be considered
@@ -947,6 +958,7 @@ typedef enum {
 
   SPLT_INVALID_REGEX = -800,
   SPLT_REGEX_NO_MATCH = -801,
+  SPLT_REGEX_UNAVAILABLE = -802,
 } splt_code;
 
 //internal
@@ -1083,6 +1095,18 @@ typedef enum {
    * Default is #SPLT_DEFAULT_PARAM_TRACKS
    */
   SPLT_OPT_PARAM_NUMBER_TRACKS,
+  /**
+   * The desired number of shots when having a
+   * #SPLT_OPTION_SILENCE_MODE or #SPLT_OPTION_TRIM_SILENCE_MODE split
+   * or using the #SPLT_OPT_AUTO_ADJUST option
+   *
+   * The option can take positive integer values. It defines the number of shots to be
+   * found after the silence. Decrease this value if you need to split files having 
+   * closer silence points.
+   *
+   * Default is #SPLT_DEFAULT_PARAM_SHOTS
+   */
+  SPLT_OPT_PARAM_SHOTS,
   /**
    * Allows you to remove the silence between the split tracks when
    * having a #SPLT_OPTION_SILENCE_MODE split
@@ -1322,7 +1346,7 @@ static const char splt_id3v1_genres[SPLT_ID3V1_NUMBER_OF_GENRES][25] = {
 /**
  * @brief Package version
  */
-#define SPLT_PACKAGE_VERSION "0.7.1"
+#define SPLT_PACKAGE_VERSION "0.7.2"
 #endif
 /**
  * @brief Package authors

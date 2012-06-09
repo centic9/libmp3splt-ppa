@@ -1,0 +1,89 @@
+# -*- makefile -*-
+
+# This is the rules file used to build Debian packages depending on libmp3splt
+
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+ifeq ($(PACKAGE_TYPE),libmp3splt)
+CFLAGS:=$(filter-out -Werror=format-security, $(CFLAGS))
+CXXFLAGS:=$(filter-out -Werror=format-security, $(CXXFLAGS))
+endif
+
+me:=$(lastword $(MAKEFILE_LIST))
+
+i_am_not_dev=no
+dev_findable=yes
+ifeq ($(strip $(wildcard ../libmp3splt/debian/mp3splt.rules)),)
+dev_findable=no
+endif
+ifeq ($(me),/usr/share/libmp3splt-dev/mp3splt.rules)
+i_am_not_dev=yes
+endif
+
+ifneq (,$(filter no, $(dev_findable) $(i_am_not_dev)))
+
+BUILD_DEPS:=debhelper (>= 7.0.50)
+
+PACKAGE_TYPE ?= mp3splt
+
+whoami:
+	@echo "common libmp3splt rules file is: $(me)"
+
+%:
+	dh $(DH_OPTS) $@
+
+clean: force-regenerate
+	dh $(DH_OPTS) $@
+
+regenerate:
+	@make -f debian/rules check-regenerate
+	@make -f debian/rules do-regenerate
+
+mp3splt-check-regenerate:
+	[ -d ../libmp3splt/debian/ ]
+
+force-regenerate:
+	if make -f debian/rules check-regenerate; then make -f debian/rules do-regenerate; fi
+
+check-regenerate: $(PACKAGE_TYPE)-check-regenerate
+	@
+
+do-regenerate: $(PACKAGE_TYPE)-do-regenerate
+	@
+
+INTERNAL_OVERRIDE_MINIMUM_VERSION=0.7.2-2
+
+PKG=$(shell dpkg-parsechangelog | awk '/^Source:/{print $$2}')
+
+mp3splt-do-regenerate:
+	sh ../libmp3splt/debian/generate ../libmp3splt/debian/mp3splt.control.in MP3SPLT_BUILDDEPS="$(BUILD_DEPS), $(shell INTERNAL_OVERRIDE_MINIMUM_VERSION=$(INTERNAL_OVERRIDE_MINIMUM_VERSION) OVERRIDE_MINIMUM_VERSION=$(OVERRIDE_MINIMUM_VERSION) sh ../libmp3splt/debian/shlibs-string.sh -dev)" $(shell LONG_INTERFACE=$(LONG_INTERFACE) SHORT_INTERFACE=$(SHORT_INTERFACE) sh ../libmp3splt/debian/extra_opts) SUGGESTS=$(SUGGESTS) RECOMMENDS=$(RECOMMENDS)
+	cp ../libmp3splt/debian/watch debian/watch
+	sed -i "s/libmp3splt/$(PKG)/g" debian/watch
+	cp ../libmp3splt/debian/compat debian/compat
+	cp ../libmp3splt/debian/clean debian/clean
+
+build-deps:
+	@echo "$(BUILD_DEPS)"
+
+override_dh_auto_configure:
+	dh_auto_configure -- --disable-mp3splttest $(EXTRA_CONFIGURE_OPTS)
+
+SONAME=$(shell sh ./debian/soname)
+
+libmp3splt-check-regenerate:
+	[ -d ../mp3splt/debian/ ]
+
+libmp3splt-do-regenerate:
+	./debian/generate debian/control.in "BUILDDEPS=$(shell make -s -f debian/mp3splt.rules build-deps)" "SONAME=$(shell grep version-info src/Makefile.am | sed -r 's/.*-version-info (.):.*/\1/')"
+
+.PHONY: clean build force-regenerate regenerate mp3splt-do-regenerate mp3splt-check-regenerate override_dh_auto_configure build-deps libmp3splt-do-regenerate libmp3splt-check-regenerate
+
+ifneq ($(strip $(wildcard debian/rules.local)),)
+include debian/rules.local
+endif
+
+else
+
+include ../libmp3splt/debian/mp3splt.rules
+
+endif

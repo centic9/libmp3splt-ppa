@@ -1,0 +1,19 @@
+Source: ###PACKAGE_NAME###
+Section: ###SECTION###
+Priority: ###PRIORITY###
+Maintainer: ###LIBMP3SPLT_MAINTAINER###
+Build-Depends: ###MP3SPLT_BUILDDEPS###
+Standards-Version: ###LIBMP3SPLT_STANDARDS_VERSION###
+Homepage: ###LIBMP3SPLT_HOMEPAGE###
+Vcs-Git: ###LIBMP3SPLT_VCS_GIT###
+Vcs-Browser: ###LIBMP3SPLT_VCS_BROWSER###
+
+Package: ###PACKAGE_NAME###
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmp3splt0-mp3 | libmp3splt0-plugin
+Recommends: libmp3splt0-mp3, libmp3splt0-ogg, ###RECOMMENDS###
+Suggests: ###OTHER_PACKAGE###, ###SUGGESTS###
+Description: ###SHORT_INTERFACE### interface to split MP3 and Ogg Vorbis files without reencoding
+###DESCRIPTION###
+ .
+ This package provides ###PACKAGE_NAME###, the ###LONG_INTERFACE### interface.

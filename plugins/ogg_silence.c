@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2011 Alexandru Munteanu - <io_fx@yahoo.fr>
+ * Copyright (c) 2005-2012 Alexandru Munteanu - <io_fx@yahoo.fr>
  *
  * Parts of this file have been copied from the 'vcut' 1.6
  * program provided with 'vorbis-tools' :
@@ -54,20 +54,19 @@ static void splt_ogg_scan_silence_and_process(splt_state *state, short seconds,
 static int splt_ogg_silence(splt_ogg_state *oggstate, vorbis_dsp_state *vd, float threshold);
 
 int splt_ogg_scan_silence(splt_state *state, short seconds, float threshold, 
-    float min, short output, ogg_page *page, ogg_int64_t granpos,
+    float min, int shots, short output, ogg_page *page, ogg_int64_t granpos,
     int *error, ogg_int64_t first_cut_granpos,
     short silence_processor(double time, int silence_was_found, short must_flush,
       splt_scan_silence_data *ssd, int *found, int *error))
 {
-  splt_scan_silence_data *ssd = splt_scan_silence_data_new(state, output, min, SPLT_FALSE);
+  splt_scan_silence_data *ssd = splt_scan_silence_data_new(state, output, min, shots, SPLT_FALSE);
   if (ssd == NULL)
   {
     *error = SPLT_ERROR_CANNOT_ALLOCATE_MEMORY;
     return -1;
   }
 
-  splt_ogg_scan_silence_and_process(state, seconds, threshold, page, granpos, first_cut_granpos, 
-      silence_processor, ssd, error);
+  splt_ogg_scan_silence_and_process(state, seconds, threshold, page, granpos, first_cut_granpos, silence_processor, ssd, error);
 
   int found = ssd->found;
 

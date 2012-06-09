@@ -1,0 +1,3 @@
+#!/bin/sh
+
+awk '/^X-Soname-Version:/{print $2}' debian/control

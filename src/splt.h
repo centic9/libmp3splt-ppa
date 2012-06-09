@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2011 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
  *
  * http://mp3splt.sourceforge.net
  *
@@ -126,7 +126,6 @@ void splt_s_wrap_split(splt_state *state, int *error);
 #define SPLT_DEFAULT_PROGRESS_RATE2 50
 
 #define SPLT_DEFAULTSILLEN 10
-#define SPLT_DEFAULTSHOT 25
 
 #define SPLT_VARCHAR '@'
 

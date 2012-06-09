@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2011 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
  *
  * http://mp3splt.sourceforge.net
  *
@@ -227,6 +227,11 @@ void splt_check_set_correct_options(splt_state *state)
     {
       splt_o_set_float_option(state, SPLT_OPT_PARAM_MIN_LENGTH, SPLT_DEFAULT_PARAM_MINIMUM_LENGTH);
       splt_o_set_int_option(state, SPLT_OPT_AUTO_ADJUST, SPLT_FALSE);
+    }
+
+    if (splt_o_get_int_option(state, SPLT_OPT_PARAM_SHOTS) < 0)
+    {
+      splt_o_set_int_option(state, SPLT_OPT_PARAM_SHOTS, SPLT_DEFAULT_PARAM_SHOTS);
     }
 
     if (splt_o_get_float_option(state, SPLT_OPT_PARAM_MIN_TRACK_LENGTH) < 0.f)
