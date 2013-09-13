@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -41,8 +40,12 @@ Actually split the input file
 
 #include "splt.h"
 
+static splt_code splt_s_open_full_log_filename(splt_state *state);
+static void splt_s_close_full_log_filename(splt_state *state);
+
 /****************************/
 /*! normal split */
+
 static long splt_s_real_split(double splt_beg, double splt_end, 
     int save_end_point, int *error, splt_state *state)
 {
@@ -163,6 +166,12 @@ void splt_s_multiple_split(splt_state *state, int *error)
   int i = 0;
   int number_of_splitpoints = splt_t_get_splitnumber(state);
 
+  int save_end_point = SPLT_TRUE;
+  if (splt_o_get_long_option(state, SPLT_OPT_OVERLAP_TIME) > 0)
+  {
+    save_end_point = SPLT_FALSE;
+  }
+
   while (i  < number_of_splitpoints - 1)
   {
     splt_t_set_current_split(state, i);
@@ -189,9 +198,12 @@ void splt_s_multiple_split(splt_state *state, int *error)
 
       int end_point_index = i+1;
       long new_end_point = splt_s_split(state, i, end_point_index, error);
-      splt_pair *index_end_point =
-        splt_pair_new((void *) &end_point_index, (void *) &new_end_point);
-      splt_array_append(new_end_points, (void *)index_end_point);
+
+      if (save_end_point)
+      {
+        splt_il_pair *index_end_point = splt_il_pair_new(end_point_index, new_end_point);
+        splt_array_append(new_end_points, (void *)index_end_point);
+      }
 
       splt_sp_set_splitpoint_value(state, i + 1, saved_end_point);
 
@@ -212,13 +224,13 @@ void splt_s_multiple_split(splt_state *state, int *error)
 end:
   for (i = 0;i < splt_array_length(new_end_points);i++)
   {
-    splt_pair *index_end_point = (splt_pair *) splt_array_get(new_end_points, i);
+    splt_il_pair *index_end_point = (splt_il_pair *) splt_array_get(new_end_points, i);
 
     splt_sp_set_splitpoint_value(state,
-        *((int*) splt_pair_first(index_end_point)),
-        *((long*) splt_pair_second(index_end_point)));
+        splt_il_pair_first(index_end_point),
+        splt_il_pair_second(index_end_point));
 
-    splt_pair_free(&index_end_point);
+    splt_il_pair_free(&index_end_point);
   }
 
   splt_array_free(&new_end_points);
@@ -359,6 +371,34 @@ bloc_end:
 /************************************/
 /*! time and length split           */
 
+static double splt_s_get_real_end_time_splitpoint(splt_state *state, 
+    int current_split, long total_time)
+{
+  long overlapped_time = splt_sp_overlap_time(state, current_split+1);
+  double overlapped_end = -1;
+  if (overlapped_time == LONG_MAX)
+  {
+    return overlapped_end;
+  }
+
+  overlapped_end = (double) ((double) overlapped_time / 100.0);
+
+  if (total_time <= 0)
+  {
+    return overlapped_end;
+  }
+
+  long minimum_length = splt_o_get_long_option(state, SPLT_OPT_TIME_MINIMUM_THEORETICAL_LENGTH);
+  long remaining_time = total_time - overlapped_time;
+  if (remaining_time > 0 && remaining_time < minimum_length)
+  {
+    splt_sp_set_splitpoint_value(state, current_split + 1, total_time);
+    return -1.0;
+  }
+
+  return overlapped_end;
+}
+
 static void splt_s_split_by_time(splt_state *state, int *error,
     double split_time_length, int number_of_files)
 {
@@ -420,12 +460,8 @@ static void splt_s_split_by_time(splt_state *state, int *error,
           long end_splitpoint = splt_co_time_to_long_ceil(end);
           splt_sp_set_splitpoint_value(state, current_split+1, end_splitpoint);
 
-          long overlapped_time = splt_sp_overlap_time(state, current_split+1);
-          double overlapped_end = -1;
-          if (overlapped_time != LONG_MAX)
-          {
-            overlapped_end = (double) ((double) overlapped_time / 100.0);
-          }
+          double real_end_splitpoint =
+            splt_s_get_real_end_time_splitpoint(state, current_split, total_time);
 
           err = splt_u_finish_tags_and_put_output_format_filename(state, -1);
           if (err < 0) { *error = err; break; }
@@ -434,21 +470,24 @@ static void splt_s_split_by_time(splt_state *state, int *error,
           if (err < 0) { *error = err; break; }
 
           double new_sec_end_point = splt_p_split(state, final_fname,
-              begin, overlapped_end, error, save_end_point);
-          long new_end_point = 0;
-          if (new_sec_end_point == -1.0)
-          {
-            new_end_point = LONG_MAX;
-          }
-          else
-          {
-            new_end_point = splt_co_time_to_long_ceil(new_sec_end_point);
-          }
+              begin, real_end_splitpoint, error, save_end_point);
 
-          int end_point_index = current_split + 1;
-          splt_pair *index_end_point =
-            splt_pair_new((void *) &end_point_index, (void *) &new_end_point);
-          splt_array_append(new_end_points, (void *) index_end_point);
+          if (save_end_point)
+          {
+            long new_end_point = 0;
+            if (new_sec_end_point == -1.0)
+            {
+              new_end_point = LONG_MAX;
+            }
+            else
+            {
+              new_end_point = splt_co_time_to_long_ceil(new_sec_end_point);
+            }
+
+            int end_point_index = current_split + 1;
+            splt_il_pair *index_end_point = splt_il_pair_new(end_point_index, new_end_point);
+            splt_array_append(new_end_points, (void *) index_end_point);
+          }
 
           //if no error for the split, put the split file
           if (*error >= 0)
@@ -499,13 +538,13 @@ static void splt_s_split_by_time(splt_state *state, int *error,
       int i = 0;
       for (i = 0;i < splt_array_length(new_end_points);i++)
       {
-        splt_pair *index_end_point = (splt_pair *) splt_array_get(new_end_points, i);
+        splt_il_pair *index_end_point = (splt_il_pair *) splt_array_get(new_end_points, i);
 
         splt_sp_set_splitpoint_value(state,
-            *((int*) splt_pair_first(index_end_point)),
-            *((long*) splt_pair_second(index_end_point)));
+            splt_il_pair_first(index_end_point),
+            splt_il_pair_second(index_end_point));
 
-        splt_pair_free(&index_end_point);
+        splt_il_pair_free(&index_end_point);
       }
 
       splt_array_free(&new_end_points);
@@ -550,14 +589,14 @@ void splt_s_time_split(splt_state *state, int *error)
 {
   splt_c_put_info_message_to_client(state, _(" info: starting time mode split\n"));
 
-  double split_time_length = (double) splt_o_get_float_option(state, SPLT_OPT_SPLIT_TIME);
-  if (((long)split_time_length) == 0)
+  long split_time_length = splt_o_get_long_option(state, SPLT_OPT_SPLIT_TIME);
+  if (split_time_length == 0)
   {
     *error = SPLT_ERROR_TIME_SPLIT_VALUE_INVALID;
     return;
   }
 
-  splt_s_split_by_time(state, error, split_time_length, -1);
+  splt_s_split_by_time(state, error, split_time_length / 100.0, -1);
 }
 
 /*! function used with the -L option (length split)
@@ -609,8 +648,9 @@ int splt_s_set_trim_silence_splitpoints(splt_state *state, int *error)
   if (! splt_o_get_int_option(state,SPLT_OPT_QUIET_MODE))
   {
     splt_c_put_info_message_to_client(state, 
-        _(" Trim silence split - Th: %.1f dB\n"),
-        splt_o_get_float_option(state, SPLT_OPT_PARAM_THRESHOLD));
+        _(" Trim silence split - Th: %.1f dB, Min: %.2f sec\n"),
+        splt_o_get_float_option(state, SPLT_OPT_PARAM_THRESHOLD),
+        splt_o_get_float_option(state, SPLT_OPT_PARAM_MIN_LENGTH));
   }
 
   if (state->split.get_silence_level)
@@ -743,11 +783,13 @@ int splt_s_set_silence_splitpoints(splt_state *state, int *error)
   char remove_str[128] = { '\0' };
   if (splt_o_get_int_option(state, SPLT_OPT_PARAM_REMOVE_SILENCE))
   {
-    snprintf(remove_str,128,_("YES"));
+    snprintf(remove_str, 128, "%s(%.2f-%.2f)", _ ("YES"),
+        splt_o_get_float_option(state, SPLT_OPT_KEEP_SILENCE_LEFT),
+        splt_o_get_float_option(state, SPLT_OPT_KEEP_SILENCE_RIGHT));
   }
   else
   {
-    snprintf(remove_str,128,_("NO"));
+    snprintf(remove_str, 128 ,_("NO"));
   }
 
   char auto_user_str[128] = { '\0' };
@@ -760,18 +802,38 @@ int splt_s_set_silence_splitpoints(splt_state *state, int *error)
     snprintf(auto_user_str,128,_("Auto"));
   }
 
-  if (! splt_o_get_int_option(state,SPLT_OPT_QUIET_MODE))
+  if (! splt_o_get_int_option(state, SPLT_OPT_QUIET_MODE))
   {
-    splt_c_put_info_message_to_client(state, 
+    char *other_options = NULL;
+
+    if (splt_o_get_float_option(state, SPLT_OPT_PARAM_MIN_TRACK_JOIN) > 0)
+    {
+      char *min_track_join = 
+        splt_su_get_formatted_message(state, ", %s: %.2f", "Min track join",
+            splt_o_get_float_option(state, SPLT_OPT_PARAM_MIN_TRACK_JOIN));
+
+      int err = splt_su_append_str(&other_options, min_track_join, NULL);
+      if (err < 0) { *error = err; goto end; }
+
+      free(min_track_join);
+    }
+
+    splt_c_put_info_message_to_client(state,
         _(" Silence split type: %s mode (Th: %.1f dB,"
-          " Off: %.2f, Min: %.2f, Remove: %s, Min track: %.2f, Shots: %d)\n"),
+          " Off: %.2f, Min: %.2f, Remove: %s, Min track: %.2f, Shots: %d%s)\n"),
         auto_user_str,
         splt_o_get_float_option(state, SPLT_OPT_PARAM_THRESHOLD),
         splt_o_get_float_option(state, SPLT_OPT_PARAM_OFFSET),
         splt_o_get_float_option(state, SPLT_OPT_PARAM_MIN_LENGTH),
         remove_str,
         splt_o_get_float_option(state, SPLT_OPT_PARAM_MIN_TRACK_LENGTH),
-        splt_o_get_int_option(state, SPLT_OPT_PARAM_SHOTS));
+        splt_o_get_int_option(state, SPLT_OPT_PARAM_SHOTS), 
+        other_options == NULL ? "" : other_options);
+
+    if (other_options)
+    {
+      free(other_options);
+    }
   }
  
   short read_silence_from_logs = SPLT_FALSE;
@@ -801,7 +863,13 @@ int splt_s_set_silence_splitpoints(splt_state *state, int *error)
     {
       state->split.get_silence_level(0, INT_MAX, state->split.silence_level_client_data);
     }
+
+    int err = splt_s_open_full_log_filename(state);
+    if (err < 0) { *error = err; goto end; }
+
     found = splt_p_scan_silence(state, error);
+
+    splt_s_close_full_log_filename(state);
   }
 
   //if no error
@@ -848,8 +916,6 @@ int splt_s_set_silence_splitpoints(splt_state *state, int *error)
 
       int i;
 
-      //we take all splitpoints found and we remove silence 
-      //if needed
       for (i = 1; i < found; i++)
       {
         if (temp == NULL)
@@ -858,49 +924,56 @@ int splt_s_set_silence_splitpoints(splt_state *state, int *error)
           break;
         }
 
-        long end_track_point = 0;
-        long end_track_point_after_silence = 0;
-        if (splt_o_get_int_option(state, SPLT_OPT_PARAM_REMOVE_SILENCE))
-        {
-          end_track_point = splt_co_time_to_long(temp->begin_position);
-          end_track_point_after_silence = splt_co_time_to_long(temp->end_position);
-        }
-        else 
-        {
-          end_track_point = splt_co_time_to_long(splt_siu_silence_position(temp, offset));
-        }
-
         if (i == 1)
         {
           append_error = splt_sp_append_splitpoint(state, 0, NULL, SPLT_SPLITPOINT);
           if (append_error < 0) { *error = append_error; found = i; break;}
+
+          splitpoints_appended++;
         }
 
         if (splt_o_get_int_option(state, SPLT_OPT_PARAM_REMOVE_SILENCE))
         {
-          append_error = splt_sp_append_splitpoint(state, end_track_point, NULL, SPLT_SKIPPOINT);
-          if (append_error < 0) { *error = append_error; found = i; break;}
-          append_error =
-            splt_sp_append_splitpoint(state, end_track_point_after_silence, NULL, SPLT_SPLITPOINT);
-          if (append_error < 0) { *error = append_error; found = i; break;}
+          long end_track_point = splt_co_time_to_long(temp->begin_position);
+          long end_track_point_after_silence = splt_co_time_to_long(temp->end_position);
+          long silence_length = end_track_point_after_silence - end_track_point;
+
+          float keep_silence_left = splt_o_get_float_option(state, SPLT_OPT_KEEP_SILENCE_LEFT);
+          float keep_silence_right = splt_o_get_float_option(state, SPLT_OPT_KEEP_SILENCE_RIGHT);
+          long keep_silence_total = splt_co_time_to_long(keep_silence_left + keep_silence_right);
+
+          if (silence_length > keep_silence_total)
+          {
+            long adjusted_silence_left = splt_co_time_to_long(temp->begin_position + keep_silence_right);
+            long adjusted_silence_right = splt_co_time_to_long(temp->end_position - keep_silence_left);
+
+            append_error = splt_sp_append_splitpoint(state, adjusted_silence_left, NULL, SPLT_SKIPPOINT);
+            if (append_error < 0) { *error = append_error; found = i; break;}
+            append_error =
+              splt_sp_append_splitpoint(state, adjusted_silence_right, NULL, SPLT_SPLITPOINT);
+            if (append_error < 0) { *error = append_error; found = i; break;}
+
+            splitpoints_appended += 2;
+          }
+          else
+          {
+            float offset = keep_silence_right / (keep_silence_left + keep_silence_right);
+            long end_track_point = splt_co_time_to_long(splt_siu_silence_position(temp, offset));
+            append_error = splt_sp_append_splitpoint(state, end_track_point, NULL, SPLT_SPLITPOINT);
+            if (append_error < 0) { *error = append_error; found = i; break;}
+            splitpoints_appended++;
+          }
         }
         else
         {
+          long end_track_point = splt_co_time_to_long(splt_siu_silence_position(temp, offset));
           append_error = splt_sp_append_splitpoint(state, end_track_point, NULL, SPLT_SPLITPOINT);
           if (append_error != SPLT_OK) { *error = append_error; found = i; break; }
+
+          splitpoints_appended++;
         }
 
         temp = temp->next;
-      }
-
-      //we order the splitpoints
-      if (splt_o_get_int_option(state, SPLT_OPT_PARAM_REMOVE_SILENCE))
-      {
-        splitpoints_appended = (found-1)*2+1;
-      }
-      else 
-      {
-        splitpoints_appended = found;
       }
 
       splt_d_print_debug(state,"Order splitpoints...\n");
@@ -920,6 +993,9 @@ int splt_s_set_silence_splitpoints(splt_state *state, int *error)
         if (append_error != SPLT_OK) { *error = append_error; }
       }
 
+      splt_sp_join_minimum_tracks_splitpoints(state, error);
+      if (*error < 0) { goto end; }
+
       splt_sp_skip_minimum_track_length_splitpoints(state, error);
     }
     else
@@ -933,11 +1009,10 @@ int splt_s_set_silence_splitpoints(splt_state *state, int *error)
       //if we write the silence points log file
       if (splt_o_get_int_option(state, SPLT_OPT_ENABLE_SILENCE_LOG))
       {
-        splt_c_put_info_message_to_client(state, 
-            _(" Writing silence log file '%s' ...\n"),
-            splt_t_get_silence_log_fname(state));
-
         char *fname = splt_t_get_silence_log_fname(state);
+
+        splt_c_put_info_message_to_client(state, _(" Writing silence log file '%s' ...\n"), fname);
+
         if (! splt_o_get_int_option(state, SPLT_OPT_PRETEND_TO_SPLIT))
         {
           FILE *log_file = NULL;
@@ -974,8 +1049,8 @@ int splt_s_set_silence_splitpoints(splt_state *state, int *error)
     }
   }
 
+end:
   splt_siu_ssplit_free(&state->silence_list);
-
   splt_t_set_splitnumber(state, splitpoints_appended + 1);
 
   return found;
@@ -1071,6 +1146,36 @@ void splt_s_trim_silence_split(splt_state *state, int *error)
     default:
       break;
   }
+}
+
+static splt_code splt_s_open_full_log_filename(splt_state *state)
+{
+  char *fname = splt_t_get_silence_full_log_fname(state);
+  if (!fname || fname[0] == '\0')
+  {
+    return SPLT_OK;
+  }
+
+  state->full_log_file_descriptor = splt_io_fopen(fname, "w");
+  if (!state->full_log_file_descriptor)
+  {
+    splt_e_set_strerror_msg_with_data(state, fname);
+    return SPLT_ERROR_CANNOT_OPEN_FILE;
+  }
+
+  return SPLT_OK;
+}
+
+static void splt_s_close_full_log_filename(splt_state *state)
+{
+  if (!state->full_log_file_descriptor)
+  {
+    return;
+  }
+
+  fflush(state->full_log_file_descriptor);
+  fclose(state->full_log_file_descriptor);
+  state->full_log_file_descriptor = NULL;
 }
 
 /****************************/

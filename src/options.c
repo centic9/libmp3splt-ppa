@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -54,6 +53,7 @@ void splt_o_set_options_default_values(splt_state *state)
   state->options.parameter_shots = SPLT_DEFAULT_PARAM_SHOTS;
   state->options.parameter_minimum_length = SPLT_DEFAULT_PARAM_MINIMUM_LENGTH;
   state->options.parameter_min_track_length = SPLT_DEFAULT_PARAM_MINIMUM_TRACK_LENGTH;
+  state->options.parameter_min_track_join = SPLT_DEFAULT_PARAM_MIN_TRACK_JOIN;
 
   state->options.artist_tag_format = SPLT_NO_CONVERSION;
   state->options.album_tag_format = SPLT_NO_CONVERSION;
@@ -63,6 +63,8 @@ void splt_o_set_options_default_values(splt_state *state)
   state->options.set_file_from_cue_if_file_tag_found = SPLT_FALSE;
 
   state->options.parameter_remove_silence = SPLT_FALSE;
+  state->options.keep_silence_right = SPLT_DEFAULT_KEEP_SILENCE_RIGHT;
+  state->options.keep_silence_left = SPLT_DEFAULT_KEEP_SILENCE_LEFT;
   state->options.parameter_gap = SPLT_DEFAULT_PARAM_GAP;
   state->options.remaining_tags_like_x = -1;
   state->options.auto_increment_tracknumber_tags = 0;
@@ -70,6 +72,12 @@ void splt_o_set_options_default_values(splt_state *state)
   state->options.force_tags_version = 0;
   state->options.length_split_file_number = 1;
   state->options.replace_tags_in_tags = SPLT_FALSE;
+  state->options.cue_set_splitpoint_names_from_rem_name = SPLT_FALSE;
+  state->options.cue_disable_cue_file_created_message = SPLT_FALSE;
+  state->options.cue_cddb_add_tags_with_keep_original_tags = SPLT_FALSE;
+  state->options.id3v2_encoding = SPLT_ID3V2_UTF16;
+  state->options.input_tags_encoding = SPLT_ID3V2_UTF8;
+  state->options.time_minimum_length = 0;
 }
 
 void splt_o_set_option(splt_state *state, int option_name, const void *data)
@@ -118,6 +126,30 @@ void splt_o_set_option(splt_state *state, int option_name, const void *data)
     case SPLT_OPT_PARAM_REMOVE_SILENCE:
       state->options.parameter_remove_silence = *((int *)data);
       break;
+    case SPLT_OPT_KEEP_SILENCE_LEFT:
+      state->options.keep_silence_left = *((float *)data);
+      break;
+    case SPLT_OPT_KEEP_SILENCE_RIGHT:
+      state->options.keep_silence_right = *((float *)data);
+      break;
+    case SPLT_OPT_CUE_SET_SPLITPOINT_NAMES_FROM_REM_NAME:
+      state->options.cue_set_splitpoint_names_from_rem_name = *((int *)data);
+      break;
+    case SPLT_OPT_CUE_DISABLE_CUE_FILE_CREATED_MESSAGE:
+      state->options.cue_disable_cue_file_created_message = *((int *)data);
+      break;
+    case SPLT_OPT_CUE_CDDB_ADD_TAGS_WITH_KEEP_ORIGINAL_TAGS:
+      state->options.cue_cddb_add_tags_with_keep_original_tags = *((int *)data);
+      break;
+    case SPLT_OPT_ID3V2_ENCODING:
+      state->options.id3v2_encoding = *((int *) data);
+      break;
+    case SPLT_OPT_INPUT_TAGS_ENCODING:
+      state->options.input_tags_encoding = *((int *) data); 
+      break;
+    case SPLT_OPT_TIME_MINIMUM_THEORETICAL_LENGTH:
+      state->options.time_minimum_length = *((long *) data);
+      break;
     case SPLT_OPT_PARAM_GAP:
       state->options.parameter_gap = *((int *)data);
       break;
@@ -139,13 +171,11 @@ void splt_o_set_option(splt_state *state, int option_name, const void *data)
     case SPLT_OPT_REPLACE_TAGS_IN_TAGS:
       state->options.replace_tags_in_tags = *((int *)data);
       break;
-
     case SPLT_OPT_OVERLAP_TIME:
       state->options.overlap_time = *((long *)data);
       break;
-
     case SPLT_OPT_SPLIT_TIME:
-      state->options.split_time = *((float *)data);
+      state->options.split_time = *((long *)data);
       break;
     case SPLT_OPT_PARAM_THRESHOLD:
       state->options.parameter_threshold = *((float *)data);
@@ -158,6 +188,9 @@ void splt_o_set_option(splt_state *state, int option_name, const void *data)
       break;
     case SPLT_OPT_PARAM_MIN_TRACK_LENGTH:
       state->options.parameter_min_track_length = *((float *)data);
+      break;
+    case SPLT_OPT_PARAM_MIN_TRACK_JOIN:
+      state->options.parameter_min_track_join = *((float *)data);
       break;
     case SPLT_OPT_ARTIST_TAG_FORMAT:
       state->options.artist_tag_format = *((int *)data);
@@ -228,6 +261,22 @@ static void *splt_o_get_option(splt_state *state, int option_name)
       return &state->options.parameter_shots;
     case SPLT_OPT_PARAM_REMOVE_SILENCE:
       return &state->options.parameter_remove_silence;
+    case SPLT_OPT_KEEP_SILENCE_LEFT:
+      return &state->options.keep_silence_left;
+    case SPLT_OPT_KEEP_SILENCE_RIGHT:
+      return &state->options.keep_silence_right;
+    case SPLT_OPT_CUE_SET_SPLITPOINT_NAMES_FROM_REM_NAME:
+      return &state->options.cue_set_splitpoint_names_from_rem_name;
+    case SPLT_OPT_CUE_DISABLE_CUE_FILE_CREATED_MESSAGE:
+      return &state->options.cue_disable_cue_file_created_message;
+    case SPLT_OPT_CUE_CDDB_ADD_TAGS_WITH_KEEP_ORIGINAL_TAGS:
+      return &state->options.cue_cddb_add_tags_with_keep_original_tags;
+    case SPLT_OPT_ID3V2_ENCODING:
+      return &state->options.id3v2_encoding;
+    case SPLT_OPT_INPUT_TAGS_ENCODING:
+      return &state->options.input_tags_encoding;
+    case SPLT_OPT_TIME_MINIMUM_THEORETICAL_LENGTH:
+      return &state->options.time_minimum_length;
     case SPLT_OPT_PARAM_GAP:
       return &state->options.parameter_gap;
     case SPLT_OPT_ALL_REMAINING_TAGS_LIKE_X:
@@ -254,6 +303,8 @@ static void *splt_o_get_option(splt_state *state, int option_name)
       return &state->options.parameter_minimum_length;
     case SPLT_OPT_PARAM_MIN_TRACK_LENGTH:
       return &state->options.parameter_min_track_length;
+    case SPLT_OPT_PARAM_MIN_TRACK_JOIN:
+      return &state->options.parameter_min_track_join;
     case SPLT_OPT_ARTIST_TAG_FORMAT:
       return &state->options.artist_tag_format;
     case SPLT_OPT_ALBUM_TAG_FORMAT:

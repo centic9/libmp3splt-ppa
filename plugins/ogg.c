@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - <io_fx@yahoo.fr>
+ * Copyright (c) 2005-2013 Alexandru Munteanu - <m@ioalex.net>
  *
  * Large parts of this files have been copied from the 'vcut' 1.6
  * program provided with 'vorbis-tools' :
@@ -31,8 +31,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -72,7 +71,6 @@ The Plug-in that handles ogg vorbis files
 /* some function prototypes */
 
 splt_ogg_state *splt_ogg_info(FILE *in, splt_state *state, int *error);
-static void splt_ogg_clear_sync_in(splt_ogg_state *oggstate);
 static void splt_ogg_clear_sync_in_and_free(splt_ogg_state *oggstate);
 
 /****************************/
@@ -401,6 +399,7 @@ static int splt_ogg_read_headers_and_save_them(splt_state *state, splt_ogg_state
   }
 
   oggstate->serial = ogg_page_serialno(&page);
+  oggstate->saved_serial = ogg_page_serialno(&page);
   //how to handle alloc memory problem ?
   ogg_stream_init(oggstate->stream_in, oggstate->serial);
   if(ogg_stream_pagein(oggstate->stream_in, &page) < 0)
@@ -487,8 +486,7 @@ static int splt_ogg_read_headers_and_save_them(splt_state *state, splt_ogg_state
     }
     if (ogg_sync_wrote(oggstate->sync_in, bytes) != 0)
     {
-      *error = SPLT_ERROR_INVALID;
-      goto error;
+      goto error_invalid_file;
     }
   }
 
@@ -523,7 +521,7 @@ splt_ogg_state *splt_ogg_info(FILE *in, splt_state *state, int *error)
     int ret = ov_open(oggstate->in, &oggstate->vf, NULL, 0);
     if(ret < 0)
     {
-      splt_e_set_error_data(state,filename);
+      splt_e_set_error_data(state, filename);
       switch (ret)
       {
         case OV_EREAD:
@@ -620,7 +618,8 @@ static int splt_ogg_find_begin_cutpoint(splt_state *state, splt_ogg_state *oggst
         //result==1 means that we have a good page
         if (result > 0)
         {
-          if (ogg_page_bos(&page))
+          if (ogg_page_bos(&page) &&
+              (oggstate->saved_serial != ogg_page_serialno(&page)))
           {
             splt_ogg_initialise_for_new_stream(ogg_new_stream_handler, 
                 &page, &cutpoint, prevgranpos);
@@ -792,8 +791,8 @@ error:
 //Warning ! cutpoint is not the end cutpoint, but the length between the
 //begin and the end
 static int splt_ogg_find_end_cutpoint(splt_state *state, ogg_stream_state *stream,
-    FILE *in, FILE *f, ogg_int64_t cutpoint, int adjust, float threshold, int shots,
-    int *error, const char *output_fname, int save_end_point,
+    FILE *in, FILE *f, ogg_int64_t cutpoint, int adjust, float threshold, float min_length,
+    int shots, int *error, const char *output_fname, int save_end_point,
     double *sec_split_time_length)
 {
   splt_c_put_progress_text(state, SPLT_PROGRESS_CREATE);
@@ -814,6 +813,8 @@ static int splt_ogg_find_end_cutpoint(splt_state *state, ogg_stream_state *strea
   ogg_page page;
   int eos=0;
   int result = 0;
+  int after_adjust = 0;
+  ogg_int64_t up_to_adjust_granpos = 0;
   ogg_int64_t page_granpos = 0, current_granpos = 0, prev_granpos = 0;
   ogg_int64_t packetnum = 0; /* Should this start from 0 or 2 ? */
 
@@ -915,7 +916,8 @@ static int splt_ogg_find_end_cutpoint(splt_state *state, ogg_stream_state *strea
       {
         if (result != -1)
         {
-          if (ogg_page_bos(&page))
+          if (ogg_page_bos(&page) &&
+              (oggstate->saved_serial != ogg_page_serialno(&page)))
           {
             splt_ogg_initialise_for_new_stream(ogg_new_stream_handler, &page, &cutpoint, prev_granpos);
             oggstate->cutpoint_begin = 0;
@@ -990,15 +992,26 @@ static int splt_ogg_find_end_cutpoint(splt_state *state, ogg_stream_state *strea
                       (splt_o_get_int_option(state,SPLT_OPT_SPLIT_MODE) == SPLT_OPTION_TRIM_SILENCE_MODE) ||
                       (!splt_o_get_int_option(state,SPLT_OPT_AUTO_ADJUST)))
                   {
+                    /*fprintf(stdout, "%lf\t%lf\tx\n", (double)page_granpos, (double)cutpoint);
+                    fflush(stdout);*/
                     splt_c_update_progress(state, (double)page_granpos,
                         (double)cutpoint,
                         1,0,SPLT_DEFAULT_PROGRESS_RATE);
                   }
                   else
                   {
-                    splt_c_update_progress(state, (double)page_granpos,
-                        (double)cutpoint,
-                        2,0,SPLT_DEFAULT_PROGRESS_RATE);
+                    /*fprintf(stdout, "%lf\t%lf\to\n", (double)page_granpos, (double)cutpoint);
+                    fflush(stdout);*/
+                    int progress_stage = 2;
+                    float progress_start = 0;
+                    if (after_adjust)
+                    {
+                      progress_stage = 4;
+                      progress_start = 0.75;
+                    }
+                    splt_c_update_progress(state, (double)(page_granpos - up_to_adjust_granpos),
+                        (double)(cutpoint - up_to_adjust_granpos),
+                        progress_stage, progress_start, SPLT_DEFAULT_PROGRESS_RATE);
                   }
 
                   ogg_stream_packetin(stream, &packet);
@@ -1024,7 +1037,7 @@ static int splt_ogg_find_end_cutpoint(splt_state *state, ogg_stream_state *strea
             if (adjust)
             {
               if (splt_ogg_scan_silence(state,
-                    (2 * adjust), threshold, 0.f, shots, 0, &page, current_granpos, error, first_cut_granpos,
+                    (2 * adjust), threshold, min_length, shots, 0, &page, current_granpos, error, first_cut_granpos,
                     splt_scan_silence_processor) > 0)
               {
                 cutpoint = (splt_siu_silence_position(state->silence_list, 
@@ -1046,6 +1059,8 @@ static int splt_ogg_find_end_cutpoint(splt_state *state, ogg_stream_state *strea
 
               splt_siu_ssplit_free(&state->silence_list);
               adjust = 0;
+              after_adjust = 1;
+              up_to_adjust_granpos = page_granpos;
               splt_c_put_progress_text(state, SPLT_PROGRESS_CREATE);
 
               if (*error < 0) { goto error; }
@@ -1229,7 +1244,7 @@ error:
 
 double splt_ogg_split(const char *output_fname, splt_state *state,
     double sec_begin, double sec_end, short seekable, 
-    int adjust, float threshold, int shots, int *error, int save_end_point)
+    int adjust, float threshold, float min_length, int shots, int *error, int save_end_point)
 {
   splt_ogg_state *oggstate = state->codec;
 
@@ -1319,7 +1334,7 @@ double splt_ogg_split(const char *output_fname, splt_state *state,
 
   double sec_split_time_length = sec_end - sec_begin;
   splt_ogg_find_end_cutpoint(state, &stream_out, oggstate->in, 
-      oggstate->out, cutpoint, adjust, threshold, shots, error, output_fname,
+      oggstate->out, cutpoint, adjust, threshold, min_length, shots, error, output_fname,
       save_end_point, &sec_split_time_length);
   sec_end_time = sec_begin + sec_split_time_length;
 
@@ -1487,11 +1502,12 @@ double splt_pl_split(splt_state *state, const char *final_fname,
     int gap = splt_o_get_int_option(state, SPLT_OPT_PARAM_GAP);
     float threshold = splt_o_get_int_option(state, SPLT_OPT_PARAM_THRESHOLD);
     int shots = splt_o_get_int_option(state, SPLT_OPT_PARAM_SHOTS);
-    
+    float min_length = splt_o_get_float_option(state, SPLT_OPT_PARAM_MIN_LENGTH);
+ 
     int input_not_seekable = splt_o_get_int_option(state, SPLT_OPT_INPUT_NOT_SEEKABLE);
 
     return splt_ogg_split(final_fname, state, begin_point, end_point, 
-        input_not_seekable, gap, threshold, shots, error, save_end_point);
+        input_not_seekable, gap, threshold, min_length, shots, error, save_end_point);
   }
 
   return end_point;

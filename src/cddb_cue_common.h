@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2010 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,16 +24,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
 
 #ifndef CDDB_CUE_COMMON_H
 
-void splt_cc_put_filenames_from_tags(splt_state *state,
-    int tracks, int *error);
+void splt_cc_put_filenames_from_tags(splt_state *state, int tracks, int *error,
+    const splt_tags *all_tags, int only_set_name_if_null);
 
 #define CDDB_CUE_COMMON_H
 

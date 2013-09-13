@@ -3,7 +3,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  *********************************************************/
 
@@ -20,8 +20,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *********************************************************/
 
@@ -200,7 +199,7 @@ int splt_mp3_get_frame(splt_mp3_state *mp3state)
   }
 
   //mad_frame_decode() returns -1 if error, 0 if no error
-  return mad_frame_decode(&mp3state->frame,&mp3state->stream);
+  return mad_frame_decode(&mp3state->frame, &mp3state->stream);
 }
 
 /*! used by mp3split and mp3_scan_silence

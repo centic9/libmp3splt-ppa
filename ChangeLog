@@ -2,6 +2,77 @@ Known issues :
 
 - C library error messages not translated on windows : won't fix
 
+libmp3splt version 0.9
+-------------------------------------------------------------
+- experimental FLAC support added - stdin and stdout are not yet implemented
+- done patch tracker #6 Please support *BSD - Under *BSD, alloca(3) is defined in stdlib.h
+- fixed progress bar of ogg vorbis when using the auto adjust option
+- fixed bug #152 libmp3splt trunk: ./autogen.sh does not create file test/Makefile.in
+- fixed bug #150 - compile error if no libmp3tag around
+
+libmp3splt version 0.8.2
+-------------------------------------------------------------
+
+- added option to specify the input tags encoding for when writing ID3v2 tags
+(SPLT_OPT_INPUT_TAGS_ENCODING)
+- enable -O3 by default
+- added LIBMP3SPLT_MAJOR_VERSION, LIBMP3SPLT_MINOR_VERSION and LIBMP3SPLT_MICRO_VERSION
+(feature request #96)
+- added option SPLT_TAGS_ORIGINAL for mp3splt_tags_set 
+- added option to keep the original tags and just replace them when importing a CUE or CDDB file
+(SPLT_OPT_CUE_CDDB_ADD_TAGS_WITH_KEEP_ORIGINAL_TAGS) (feature request #95)
+- added 'split into memory' ability with a callback function for use with 'pretend to split'
+(feature request #94)
+- replaced mp3splt.m4 with pkg-config (bug #145)
+- corrected build files (configure.ac, Makefile.am, ...) and check using 'make distcheck' (bug #147)
+- fixed a lot of doxygen issues
+
+libmp3splt version 0.8.1a
+-------------------------------------------------------------
+
+- corrected ChangeLog file of 0.8.1 release
+- added minimal.c in the distribution for the doxygen documentation
+- added libmp3splt_ico.svg in the distribution for the doxygen documentation
+- added something in the empty_footer.html file to avoid doxygen segfault
+
+libmp3splt version 0.8.1
+-------------------------------------------------------------
+
+- fixed a bug - was crashing when removing tags from skippoints
+- added option to set output ID3v2 tags encoded in latin1, UTF-8 or UTF16
+- forgot to add 'empty_footer.html' in the distribution
+
+libmp3splt version 0.8
+-------------------------------------------------------------
+
+- rewritten libmp3splt public API to target future 1.0 stable release
+- written complete documentation of the public API
+- done issues #40 and #85 - added minimum silence length parameter for auto adjust
+- implemented back the proxy feature with basic authentification - feature #50
+- added option to generate exactly the same input tags bytes using @O
+- added minimum silence length for trim silence mode (minimum silence to trigger a trimming)
+- done issue #12 - added option to output the full silence log useful to plot a graph
+- enhanced the CUE export to export the tags as REM comments and also the splitpoint names
+- fixed bug when detecting the input tags version - output had no tags when the input only had ID3v1
+- fixed bug: output tags versions was not equal to the input file tags versions when the user was
+setting custom tags without any @o to get the original tags
+- done issue #79 - added 0 to the number of digits to output in order to be able to support
+the old mp3splt output format
+- fixed bug #141 - when input file is a symlink and output directory is the one of the input file
+- amplitude more precise with ogg vorbis files
+- plugins are now installed in $(libdir)/libmp3splt$(SONAME) instead of $(libdir)/libmp3splt
+- fixed bug #131 - use /usr/lib64 instead of /usr/lib on x64 in mp3splt.m4
+- fixed bug #133 - updated GPLv2 COPYING file
+- fixed bug on mp3 trim silence scan: last frame was skipped
+- fixed bug #134 - use of deprecated gethostbyname()
+
+-------------------------------------------------------------
+libmp3splt version 0.7.3
+
+- added the trackjoin parameter for silence detection split: tracks shorter than trackjoin will be joined with others
+- fixed bug: removing TLEN id3v2 tag from the split files
+- fixed bug #3530488 - regression introduced with ogg multiple logical streams 
+
 libmp3splt version 0.7.2
 -------------------------------------------------------------
 

@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -42,7 +41,7 @@ split.
 
 static void splt_t_set_default_state_values(splt_state *state, int *error)
 {
-  state->split.tags = NULL;
+  state->split.tags_group = NULL;
   splt_tu_reset_tags(splt_tu_get_tags_like_x(state));
   state->split.points = NULL;
   state->fname_to_split = NULL;
@@ -52,14 +51,18 @@ static void splt_t_set_default_state_values(splt_state *state, int *error)
   state->default_comment_tag = NULL;
   state->default_genre_tag = NULL;
   state->silence_log_fname = NULL;
+  state->silence_full_log_fname = NULL;
+  state->full_log_file_descriptor = NULL;
 
-  state->split.real_tagsnumber = 0;
-  state->split.real_splitnumber = 0;
   state->split.splitnumber = 0;
   state->split.current_split_file_number = 1;
   state->split.get_silence_level = NULL;
   state->split.put_message = NULL;
+  state->split.put_message_cb_data = NULL;
   state->split.file_split = NULL;
+  state->split.file_split_cb_data = NULL;
+  state->split.write_cb = NULL;
+  state->split.write_cb_data = NULL;
   state->split.p_bar->progress_text_max_char = 40;
   snprintf(state->split.p_bar->filename_shorted,512, "%s","");
   state->split.p_bar->percent_progress = 0;
@@ -68,13 +71,14 @@ static void splt_t_set_default_state_values(splt_state *state, int *error)
   state->split.p_bar->progress_type = SPLT_PROGRESS_PREPARE;
   state->split.p_bar->silence_found_tracks = 0;
   state->split.p_bar->silence_db_level = 0;
-  state->split.p_bar->user_data = 0;
   state->split.p_bar->progress = NULL;
+  state->split.p_bar->progress_cb_data = NULL;
   state->cancel_split = SPLT_FALSE;
 
   splt_original_tags *original_tags = &state->original_tags;
   splt_tu_reset_tags(&original_tags->tags);
   original_tags->all_original_tags = NULL;
+  original_tags->last_plugin_used = -100;
 
   splt_w_set_wrap_default_values(state);
   splt_se_set_sync_errors_default_values(state);
@@ -84,6 +88,7 @@ static void splt_t_set_default_state_values(splt_state *state, int *error)
   splt_o_set_options_default_values(state);
   splt_o_set_ioptions_default_values(state);
   splt_p_set_default_values(state);
+  splt_pr_set_default_values(state);
 }
 
 splt_state *splt_t_new_state(splt_state *state, int *error)
@@ -177,6 +182,11 @@ static void splt_t_free_state_struct(splt_state *state)
       free(state->silence_log_fname);
       state->silence_log_fname = NULL;
     }
+    if (state->silence_full_log_fname)
+    {
+      free(state->silence_full_log_fname);
+      state->silence_full_log_fname = NULL;
+    }
     if (state->wrap)
     {
       free(state->wrap);
@@ -216,6 +226,7 @@ void splt_t_free_state(splt_state *state)
       state->split.p_bar = NULL;
     }
     splt_e_free_errors(state);
+    splt_pr_free(state);
     splt_t_free_state_struct(state);
   }
 }
@@ -353,6 +364,22 @@ char *splt_t_get_silence_log_fname(splt_state *state)
   return state->silence_log_fname;
 }
 
+int splt_t_set_silence_full_log_fname(splt_state *state, const char *filename)
+{
+  splt_d_print_debug(state,"Setting silence full log fname to _%s_\n", filename);
+  return splt_su_copy(filename, &state->silence_full_log_fname);
+}
+
+char *splt_t_get_silence_full_log_fname(splt_state *state)
+{
+  return state->silence_full_log_fname;
+}
+
+FILE *splt_t_get_silence_full_log_file_descriptor(splt_state *state)
+{
+  return state->full_log_file_descriptor;
+}
+
 //! Sets the name of the file that has to be split.
 int splt_t_set_filename_to_split(splt_state *state, const char *filename)
 {
@@ -371,7 +398,7 @@ static void splt_t_set_current_split_file_number(splt_state *state, int index)
   state->split.current_split_file_number = index;
 }
 
-static void splt_t_set_current_split_file_number_next(splt_state *state)
+void splt_t_set_current_split_file_number_next(splt_state *state)
 {
   splt_t_set_current_split_file_number(state, state->split.current_split_file_number+1);
 }

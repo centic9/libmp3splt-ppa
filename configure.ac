@@ -4,7 +4,7 @@
 # *               for mp3/ogg splitting without decoding
 # *
 # * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
-# * Copyright (c) 2005-2012 Munteanu Alexandru - io_fx@yahoo.fr
+# * Copyright (c) 2005-2013 Munteanu Alexandru - m@ioalex.net
 # *
 # * http://mp3splt.sourceforge.net
 # *
@@ -24,7 +24,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+# USA.
 #
 # *********************************************************/
 
@@ -32,12 +33,26 @@
 # Basic initialisations 
 #################################################
 
-AC_PREREQ(2.62)
-AC_INIT([libmp3splt],[0.7.2],[io_fx@yahoo.fr])
+#inspired from gtk sources
+m4_define([libmp3splt_major_version], [0])
+m4_define([libmp3splt_minor_version], [9])
+m4_define([libmp3splt_micro_version], [0])
+m4_define([libmp3splt_version],
+          [libmp3splt_major_version.libmp3splt_minor_version.libmp3splt_micro_version])
+
+AC_PREREQ([2.62])
+AC_INIT([libmp3splt],[libmp3splt_version],[m@ioalex.net])
 AC_CONFIG_AUX_DIR([libltdl/config])
-AM_INIT_AUTOMAKE(libmp3splt, 0.7.2)
+AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 AM_MAINTAINER_MODE([enable])
+
+LIBMP3SPLT_MAJOR_VERSION=libmp3splt_major_version
+AC_SUBST(LIBMP3SPLT_MAJOR_VERSION)
+LIBMP3SPLT_MINOR_VERSION=libmp3splt_minor_version
+AC_SUBST(LIBMP3SPLT_MINOR_VERSION)
+LIBMP3SPLT_MICRO_VERSION=libmp3splt_micro_version
+AC_SUBST(LIBMP3SPLT_MICRO_VERSION)
 
 #################################################
 # Check for programs
@@ -57,6 +72,10 @@ AM_GNU_GETTEXT_VERSION([0.13.1])
 
 AC_C_BIGENDIAN
 AC_C_CONST
+
+SONAME=0
+AC_SUBST(SONAME)
+AC_DEFINE_UNQUOTED([SPLT_SONAME], "$SONAME", [library SONAME])
 
 #################################################################
 # Enable libtool, check for libltdl and define @LIBLTDL@ and @INCLTDL@
@@ -112,13 +131,13 @@ AC_MSG_RESULT($HOST)
 AC_ARG_ENABLE(c-debug, [AC_HELP_STRING([--enable-c-debug],[ Enable debugging symbols. ]) ],
     [enable_c_debug=$enableval],[enable_c_debug="no"])
 if test "x$enable_c_debug" = xyes;then
-  CFLAGS="$CFLAGS -g"
+  CFLAGS="$CFLAGS -g -Wall"
 fi
 
-AC_ARG_ENABLE(optimise, [AC_HELP_STRING([--enable-optimise],[ Enable O2 optimise. ]) ],
-    [enable_optimise=$enableval],[enable_optimise="no"])
+AC_ARG_ENABLE(optimise, [AC_HELP_STRING([--disable-optimise],[ Disable O3 optimise. ]) ],
+    [enable_optimise=$enableval],[enable_optimise="yes"])
 if test "x$enable_optimise" = xyes;then
-  CFLAGS="$CFLAGS -O2"
+  CFLAGS="$CFLAGS -O3"
 fi
 
 AC_ARG_ENABLE(extra-warnings, [AC_HELP_STRING([--enable-extra-warnings],[ Enable extra warnings. ]) ],
@@ -199,6 +218,24 @@ if test "x$enable_ogg_plugin" = xyes;then
   XIPH_PATH_OGG(,AC_MSG_WARN([Ogg not found! Download the latest version of libogg at http://www.xiph.org.]))
   XIPH_PATH_VORBIS(AM_CONDITIONAL(OGG_PLUGIN,true) ogg="yes",
       AC_MSG_WARN(Vorbis not found! Will build without ogg/vorbis support.))
+fi
+
+
+#################################################################
+# Check flac plugin libraries
+#################################################################
+
+#check for --disable-flac & flac libraries
+AM_CONDITIONAL(FLAC_PLUGIN,false)
+flac="no" 
+AC_ARG_ENABLE(flac, [AC_HELP_STRING([--disable-flac],[ Disable flac plugin. ]) ],
+    [enable_flac_plugin=$enableval],[enable_flac_plugin="yes"])
+
+if test "x$enable_flac_plugin" = xyes;then
+  PKG_PROG_PKG_CONFIG
+  PKG_CHECK_MODULES([FLAC], [flac >= 1.2.1],
+      [AM_CONDITIONAL(FLAC_PLUGIN, true) flac="yes" ],
+      [AC_MSG_WARN([libFLAC is not found. Will build without flac support.])])
 fi
 
 #################################################################
@@ -283,14 +320,15 @@ fi
 
 echo
 echo "---------------------------------------------------------"
-echo "Configuration:"
+echo "Configuration for libmp3splt version "libmp3splt_version" :"
 echo
 echo "    install path:            $prefix"
 echo
 echo " Plugins :"
 echo
-echo "    libmad (.mp3 format)                                    $mp3"
-echo "    libogg, libvorbis (.ogg/vorbis format)                  $ogg"
+echo "    libmad (mp3 format)                                    $mp3"
+echo "    libogg, libvorbis (ogg/vorbis format)                  $ogg"
+echo "    libFLAC (flac format)                                  $flac"
 echo
 echo " Other :"
 echo
@@ -315,6 +353,18 @@ echo
 # Generate Makefile
 #################################################
 
-AC_CONFIG_FILES([Makefile src/Makefile po/Makefile.in plugins/Makefile test/Makefile m4/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile
+libmp3splt.pc
+src/Makefile
+po/Makefile.in
+plugins/Makefile
+test/Makefile
+m4/Makefile
+doc/Makefile
+doc/Doxyfile_all
+doc/Doxyfile_api
+doc/examples/Makefile
+include/libmp3splt/version.h])
+
 AC_OUTPUT
 

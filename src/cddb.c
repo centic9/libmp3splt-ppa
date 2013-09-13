@@ -3,7 +3,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  *********************************************************/
 
@@ -20,7 +20,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * 02111-1307, USA.
  *********************************************************/
 
@@ -75,13 +75,15 @@ int splt_cddb_put_splitpoints(const char *file, splt_state *state, int *error)
   if (err < 0) { *error = err; return tracks; }
   cdu->file = file;
 
-  if (!(file_input=splt_io_fopen(file, "r")))
+  if (!(file_input = splt_io_fopen(file, "r")))
   {
     splt_cddb_cdu_free(&cdu);
     splt_e_set_strerror_msg_with_data(state, file);
     *error = SPLT_ERROR_CANNOT_OPEN_FILE;
     return tracks;
   }
+
+  splt_tags *all_tags = splt_tu_new_tags(error);
 
   if (fseek(file_input, 0, SEEK_SET) != 0)
   {
@@ -102,9 +104,15 @@ int splt_cddb_put_splitpoints(const char *file, splt_state *state, int *error)
     if (cdu->error < 0) { *error = cdu->error; goto function_end; }
   }
 
-  splt_cc_put_filenames_from_tags(state, tracks, error);
+  if (*error < 0) { goto function_end; }
+  splt_tags *tags_at_0 = splt_tu_get_tags_at(state, 0);
+  splt_tu_copy_tags(tags_at_0, all_tags, error);
+  if (*error < 0) { goto function_end; }
+
+  splt_cc_put_filenames_from_tags(state, tracks, error, all_tags, SPLT_FALSE);
 
 function_end:
+  splt_tu_free_one_tags(&all_tags);
   splt_cddb_cdu_free(&cdu);
 
   if (line)
@@ -217,7 +225,7 @@ static void splt_cddb_process_ttitle_line(const char *line_content, cddb_utils *
     *slash = '\0';
 
     char *performer = splt_su_trim_spaces(equal_ptr + 1);
-   err = splt_tu_set_tags_field(state, index, SPLT_TAGS_PERFORMER, performer);
+    err = splt_tu_set_tags_field(state, index, SPLT_TAGS_PERFORMER, performer);
     if (err < 0) { cdu->error = err; return; }
   }
   else
@@ -225,6 +233,12 @@ static void splt_cddb_process_ttitle_line(const char *line_content, cddb_utils *
     char *title = splt_su_trim_spaces(equal_ptr + 1);
     err = splt_tu_set_tags_field(state, index, SPLT_TAGS_TITLE, title);
     if (err < 0) { cdu->error = err; return; }
+  }
+
+  if (splt_o_get_int_option(state, SPLT_OPT_CUE_CDDB_ADD_TAGS_WITH_KEEP_ORIGINAL_TAGS))
+  {
+    int true_value = SPLT_TRUE;
+    splt_tu_set_tags_field(state, index, SPLT_TAGS_ORIGINAL, &true_value);
   }
 }
 

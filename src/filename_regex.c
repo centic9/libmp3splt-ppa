@@ -3,7 +3,8 @@
  * libmp3splt -- library based on mp3splt,
  *               for mp3/ogg splitting without decoding
  *
- * Copyright (c) 2010-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2010 David Belohrad
+ * Copyright (c) 2010-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -23,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -112,7 +112,7 @@ splt_tags *splt_fr_parse(splt_state *state, const char *filename, const char *re
     return NULL;
   }
 
-  splt_tags *tags = splt_tu_new_tags(state, error);
+  splt_tags *tags = splt_tu_new_tags(error);
   if (*error < 0)
   {
     pcre_free(re);
@@ -137,9 +137,8 @@ splt_tags *splt_fr_parse(splt_state *state, const char *filename, const char *re
       SPLT_TAGS_YEAR, tags, SPLT_NO_CONVERSION, SPLT_FALSE, error);
   if (*error < 0) { goto error; }
 
-  char *pattern = NULL;
   format = splt_o_get_int_option(state, SPLT_OPT_COMMENT_TAG_FORMAT);
-  pattern = splt_fr_get_pattern(re, filename, ovector, rc, "comment");
+  char *pattern = splt_fr_get_pattern(re, filename, ovector, rc, "comment");
   if (pattern)
   {
     splt_fr_set_char_field_on_tags_and_convert(tags, SPLT_TAGS_COMMENT,

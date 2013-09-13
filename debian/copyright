@@ -2,8 +2,7 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Source: http://mp3splt.sourceforge.net/
 
 Files: *
-Copyright: Copyright (c) 2002-2005 Matteo Trotta
- Copyright (c) 2005-2012 Alexandru Ionut Munteanu
+Copyright: 2005-2012 Munteanu Alexandru - <m@ioalex.net>, 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
 License: GPL-2+
 
 Files: ./src/socket_manager.c ./src/audacity.c ./src/audacity.h
@@ -30,3 +29,8 @@ License: GPL-2+
     On Debian systems you can find the full text of the GNU General
     Public License version 2 in '/usr/share/common-licenses/GPL-2'.
 
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+USA.

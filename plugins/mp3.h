@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -59,6 +58,12 @@
 typedef struct {
   id3_byte_t *tag_bytes;
   id3_length_t tag_length;
+
+  id3_byte_t *tag_bytes_v1;
+  id3_length_t tag_length_v1;
+
+  unsigned int version;
+  unsigned int bytes_tags_version;
 } tag_bytes_and_size;
 #endif
 
@@ -106,6 +111,7 @@ typedef struct {
   unsigned long frames;
   int syncdetect;
   off_t end;
+  unsigned long fend;
   off_t end_non_zero;
   off_t end2;
   off_t bytes;

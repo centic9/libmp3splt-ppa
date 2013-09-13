@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - <io_fx@yahoo.fr>
+ * Copyright (c) 2005-2013 Alexandru Munteanu - <m@ioalex.net>
  *
  * Parts of this file have been copied from the 'vcut' 1.6
  * program provided with 'vorbis-tools' :
@@ -31,8 +31,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -77,7 +76,7 @@ void splt_ogg_nsh_free(splt_ogg_new_stream_handler **nsh)
 }
 
 void splt_ogg_initialise_for_new_stream(splt_ogg_new_stream_handler *nsh, 
-    ogg_page *page, long *cutpoint, long previous_granulepos)
+    ogg_page *page, ogg_int64_t *cutpoint, ogg_int64_t previous_granulepos)
 {
   splt_ogg_state *oggstate = nsh->oggstate;
 
@@ -89,6 +88,7 @@ void splt_ogg_initialise_for_new_stream(splt_ogg_new_stream_handler *nsh,
 
   ogg_stream_clear(stream_in);
   ogg_stream_init(stream_in, ogg_page_serialno(page));
+  oggstate->saved_serial = ogg_page_serialno(page);
 
   if (cutpoint != NULL && *cutpoint != 0)
   {
