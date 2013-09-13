@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -36,7 +35,7 @@
 #include "splt.h"
 
 #ifdef __WIN32__
-#include "windows.h"
+#include <windows.h>
 #endif
 
 static void close_files(splt_state *state, const char *file1, FILE **f1,
@@ -239,6 +238,12 @@ void splt_check_set_correct_options(splt_state *state)
       splt_o_set_float_option(state, SPLT_OPT_PARAM_MIN_TRACK_LENGTH,
           SPLT_DEFAULT_PARAM_MINIMUM_TRACK_LENGTH);
     }
+
+    if (splt_o_get_float_option(state, SPLT_OPT_PARAM_MIN_TRACK_JOIN) < 0.f)
+    {
+      splt_o_set_float_option(state, SPLT_OPT_PARAM_MIN_TRACK_JOIN,
+          SPLT_DEFAULT_PARAM_MIN_TRACK_JOIN);
+    }
   }
 
   if (!splt_o_get_int_option(state,SPLT_OPT_AUTO_ADJUST))
@@ -308,6 +313,11 @@ void splt_check_file_type(splt_state *state, int *error)
     *error = SPLT_ERROR_NO_PLUGIN_FOUND_FOR_FILE;
     splt_d_print_debug(state,"No plugin found !\n");
     splt_d_print_debug(state,"Verifying if the file _%s_ is a file ...\n", filename);
+
+    if (splt_io_input_is_stdin(state))
+    {
+      return;
+    }
 
     FILE *test = NULL;
     if ((test = splt_io_fopen(filename,"r")) == NULL)

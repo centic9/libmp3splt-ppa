@@ -1,13 +1,13 @@
-/*
- * audacity.h -- Audacity label file parser portion of the Mp3Splt utility
- *                    Utility for mp3/ogg splitting without decoding
+/**
+ * libmp3splt 
+ *
+ *        Utility for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2004 M. Trotta - <matteo.trotta@lib.unimib.it>
- * Copyright (c) 2007 Federico Grau - <donfede@casagrau.org>
+ * Copyright (c) 2005-2013 Alexandru Munteanu <m@ioalex.net>
  *
  * http://mp3splt.sourceforge.net
- * http://audacity.sourceforge.net/
- */
+ **/
 
 /**********************************************************
  *
@@ -23,8 +23,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -69,15 +68,18 @@ void splt_sm_send_http_message(splt_socket_handler *sh, const char *message,
 void splt_sm_receive_and_process_without_headers(splt_socket_handler *sh, splt_state *state,
     int (*process_functor)(const char *received_line, int line_number, void *user_data),
     void *user_data, int number_of_lines_to_skip_after_headers);
-void splt_sm_receive_and_process_without_headers_with_recv(splt_socket_handler *sh, 
+
+char *splt_sm_receive_and_process_without_headers_with_recv(splt_socket_handler *sh, 
     splt_state *state,
     ssize_t (*recv_func)(int fd, void *buf, size_t len, int flags),
     int (*process_functor)(const char *received_line, int line_number, void *user_data),
     void *user_data, int number_of_lines_to_skip_after_headers);
+
 void splt_sm_receive_and_process(splt_socket_handler *sh, splt_state *state,
     int (*process_functor)(const char *received_line, int line_number, void *user_data),
     void *user_data);
-void splt_sm_receive_and_process_with_recv(splt_socket_handler *sh, splt_state *state,
+
+char *splt_sm_receive_and_process_with_recv(splt_socket_handler *sh, splt_state *state,
     ssize_t (*recv_func)(int fd, void *buf, size_t len, int flags),
     int (*process_functor)(const char *received_line, int line_number, void *user_data),
     void *user_data);

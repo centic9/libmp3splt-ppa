@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -88,6 +87,7 @@ int splt_fu_freedb_init_search(splt_state *state)
     {
       fdb->search_results->number = 0;
       fdb->search_results->results = NULL;
+      fdb->search_results->iterator_counter = 0;
     }
   }
 
@@ -199,7 +199,7 @@ static void splt_fu_free_freedb_search(splt_state *state)
   if (res)
   {
     int i = 0;
-    for(i = 0; i < res->number;i++)
+    for (i = 0; i < res->number;i++)
     {
       if (res->results[i].revisions)
       {
@@ -221,6 +221,7 @@ static void splt_fu_free_freedb_search(splt_state *state)
     }
 
     res->number = 0;
+    res->iterator_counter = 0;
 
     free(state->fdb.search_results);
     state->fdb.search_results = NULL;

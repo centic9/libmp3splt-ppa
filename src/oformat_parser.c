@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -40,6 +39,28 @@ Automatic generation of filenams for split files from tags.
 
 #include "splt.h"
 
+static void splt_of_trim_on_separator_characters(char *filename);
+static const char *splt_of_goto_last_non_separator_character(const char *format);
+
+static char *duplicate_and_clean(splt_state *state, const char *str, int *error)
+{
+  char *dup = strdup(str);
+  if (!dup)
+  {
+    *error = SPLT_ERROR_CANNOT_ALLOCATE_MEMORY;
+    return NULL;
+  }
+
+  splt_su_clean_string(state, dup, error);
+  if (error < 0)
+  {
+    free(dup);
+    return NULL;
+  }
+
+  return dup;
+}
+
 /*! \brief Is a placeholder char valid in a filename format string?
 
 \param v The character that is to be tested
@@ -48,7 +69,7 @@ Automatic generation of filenams for split files from tags.
 
 \todo Why do we need amb?
  */
-static short splt_u_output_variable_is_valid(char v, int *amb)
+static short splt_of_output_variable_is_valid(char v, int *amb)
 {
   switch (v)
   {
@@ -152,7 +173,7 @@ int splt_of_parse_outformat(char *s, splt_state *state)
       len = SPLT_MAXOLEN;
     }
 
-    if (!splt_u_output_variable_is_valid(cf, &amb))
+    if (!splt_of_output_variable_is_valid(cf, &amb))
     {
       err[0] = cf;
       splt_e_set_error_data(state, err);
@@ -167,7 +188,7 @@ int splt_of_parse_outformat(char *s, splt_state *state)
   if (last_ptre && *last_ptre != '\0')
   {
     char v = *(last_ptre+1);
-    if (!splt_u_output_variable_is_valid(v, &amb))
+    if (!splt_of_output_variable_is_valid(v, &amb))
     {
       err[0] = v;
       splt_e_set_error_data(state, err);
@@ -190,15 +211,28 @@ int splt_of_parse_outformat(char *s, splt_state *state)
   return amb;
 }
 
-static const char *splt_u_get_format_ptr(const char *format, char *temp)
+static const char *splt_u_get_format_ptr(const char *format, char *temp,
+    int *number_of_digits_to_output)
 {
   int format_length = strlen(format);
   const char *format_ptr = format;
 
   if ((format_length > 2) && isdigit(format[2]))
   {
+    if (number_of_digits_to_output)
+    {
+      sscanf(&format[2], "%d", number_of_digits_to_output);
+    }
+
     temp[2] = format[2];
     format_ptr = format + 1;
+  }
+  else
+  {
+    if (number_of_digits_to_output)
+    {
+      *number_of_digits_to_output = -1;
+    }
   }
 
   return format_ptr;
@@ -336,12 +370,12 @@ int splt_of_put_output_format_filename(splt_state *state, int current_split)
   char *output_filename = NULL;
   int output_filename_size = 0;
 
-  char *title = NULL;
-  char *artist = NULL;
-  char *album = NULL;
-  char *genre = NULL;
-  char *performer = NULL;
-  char *artist_or_performer = NULL;
+  const char *title = NULL;
+  const char *artist = NULL;
+  const char *album = NULL;
+  const char *genre = NULL;
+  const char *performer = NULL;
+  const char *artist_or_performer = NULL;
   char *original_filename = NULL;
 
   int split_file_number = splt_t_get_current_split_file_number(state);
@@ -371,9 +405,14 @@ int splt_of_put_output_format_filename(splt_state *state, int current_split)
   int fm_length = 0;
 
   //if we get the tags from the first file
-  int remaining_tags_like_x = 
-    splt_o_get_int_option(state,SPLT_OPT_ALL_REMAINING_TAGS_LIKE_X);
-  if ((tags_index >= state->split.real_tagsnumber) &&
+  int remaining_tags_like_x = splt_o_get_int_option(state,SPLT_OPT_ALL_REMAINING_TAGS_LIKE_X);
+  int real_tags_number = 0;
+  if (state->split.tags_group)
+  {
+    real_tags_number = state->split.tags_group->real_tagsnumber;
+  }
+
+  if ((tags_index >= real_tags_number) &&
       (remaining_tags_like_x != -1))
   {
     tags_index = remaining_tags_like_x;
@@ -398,6 +437,7 @@ int splt_of_put_output_format_filename(splt_state *state, int current_split)
     {
       break;
     }
+
     //if we have some % in the format (@ has been converted to %)
     if (state->oformat.format[i][0] == '%')
     {
@@ -472,32 +512,28 @@ put_value:
               const char *format = NULL;
               int offset = 5;
 
-              //don't print out @h or @H if 0 for default output
-              if ((strcmp(state->oformat.format_string, SPLT_DEFAULT_OUTPUT) == 0) &&
-                  (mMsShH_value == 0) &&
-                  (char_variable == 'h' || char_variable == 'H'))
+              int number_of_digits_to_output = 0;
+              const char *new_format = 
+                splt_u_get_format_ptr(state->oformat.format[i], temp, &number_of_digits_to_output);
+
+              if (number_of_digits_to_output == 0 && mMsShH_value == 0)
               {
-                if (char_variable == 'h')
-                {
-                  format = state->oformat.format[i]+2;
-                  offset = 0;
-                }
-                else
-                {
-                  output_filename[strlen(output_filename)-1] = '\0';
-                  break;
-                }
+                const char *start_format = state->oformat.format[i] + 3;
+                format = splt_of_goto_last_non_separator_character(start_format);
+                offset = 0;
+
+                splt_of_trim_on_separator_characters(output_filename);
               }
               else
               {
-                format = splt_u_get_format_ptr(state->oformat.format[i], temp);
+                format = new_format + 2;
               }
 
               int requested_num_of_digits = 0;
               int max_number_of_digits = splt_u_get_requested_num_of_digits(state,
                   state->oformat.format[i], &requested_num_of_digits, SPLT_FALSE);
 
-              snprintf(temp + offset, temp_len, format + 2);
+              snprintf(temp + offset, temp_len, format);
 
               fm_length = strlen(temp) + 1 + max_number_of_digits;
               if ((fm = malloc(fm_length * sizeof(char))) == NULL)
@@ -511,19 +547,12 @@ put_value:
           }
           break;
         case 'A':
-          if (splt_tu_tags_exists(state,tags_index))
+          if (splt_tu_tags_exists(state, tags_index))
           {
-            artist_or_performer =
-              (char *)splt_tu_get_tags_field(state,tags_index, SPLT_TAGS_PERFORMER);
-            splt_su_clean_string(state, artist_or_performer, &error);
-            if (error < 0) { goto end; };
-
+            artist_or_performer = splt_tu_get_tags_field(state,tags_index, SPLT_TAGS_PERFORMER);
             if (artist_or_performer == NULL || artist_or_performer[0] == '\0')
             {
-              artist_or_performer = 
-                (char *)splt_tu_get_tags_field(state,tags_index, SPLT_TAGS_ARTIST);
-              splt_su_clean_string(state, artist_or_performer, &error);
-              if (error < 0) { goto end; };
+              artist_or_performer = splt_tu_get_tags_field(state, tags_index, SPLT_TAGS_ARTIST);
             }
           }
           else
@@ -555,7 +584,10 @@ put_value:
           //
           if (artist_or_performer != NULL)
           {
-            snprintf(fm, fm_length, temp, artist_or_performer);
+            char *dup = duplicate_and_clean(state, artist_or_performer, &error);
+            if (!dup) { goto end; }
+            snprintf(fm, fm_length, temp, dup);
+            free(dup);
           }
           else
           {
@@ -564,13 +596,9 @@ put_value:
 
           break;
         case 'a':
-          if (splt_tu_tags_exists(state,tags_index))
+          if (splt_tu_tags_exists(state, tags_index))
           {
-            //we get the artist
-            artist =
-              (char *)splt_tu_get_tags_field(state,tags_index, SPLT_TAGS_ARTIST);
-            splt_su_clean_string(state, artist, &error);
-            if (error < 0) { goto end; };
+            artist = splt_tu_get_tags_field(state, tags_index, SPLT_TAGS_ARTIST);
           }
           else
           {
@@ -601,7 +629,10 @@ put_value:
           //
           if (artist != NULL)
           {
-            snprintf(fm, fm_length, temp, artist);
+            char *dup = duplicate_and_clean(state, artist, &error);
+            if (!dup) { goto end; }
+            snprintf(fm, fm_length, temp, dup);
+            free(dup);
           }
           else
           {
@@ -611,11 +642,7 @@ put_value:
         case 'b':
           if (splt_tu_tags_exists(state,tags_index))
           {
-            //we get the album
-            album =
-              (char *)splt_tu_get_tags_field(state,tags_index, SPLT_TAGS_ALBUM);
-            splt_su_clean_string(state, album, &error);
-            if (error < 0) { goto end; };
+            album = splt_tu_get_tags_field(state, tags_index, SPLT_TAGS_ALBUM);
           }
           else
           {
@@ -646,7 +673,10 @@ put_value:
           //
           if (album != NULL)
           {
-            snprintf(fm, fm_length, temp, album);
+            char *dup = duplicate_and_clean(state, album, &error);
+            if (!dup) { goto end; }
+            snprintf(fm, fm_length, temp, dup);
+            free(dup);
           }
           else
           {
@@ -656,11 +686,7 @@ put_value:
         case 'g':
           if (splt_tu_tags_exists(state,tags_index))
           {
-            //we get the genre
-            genre =
-              (char *)splt_tu_get_tags_field(state,tags_index, SPLT_TAGS_GENRE);
-            splt_su_clean_string(state, genre, &error);
-            if (error < 0) { goto end; };
+            genre = splt_tu_get_tags_field(state, tags_index, SPLT_TAGS_GENRE);
           }
           else
           {
@@ -691,7 +717,10 @@ put_value:
           //
           if (genre != NULL)
           {
-            snprintf(fm, fm_length, temp, genre);
+            char *dup = duplicate_and_clean(state, genre, &error);
+            if (!dup) { goto end; }
+            snprintf(fm, fm_length, temp, dup);
+            free(dup);
           }
           else
           {
@@ -701,9 +730,7 @@ put_value:
         case 't':
           if (splt_tu_tags_exists(state,tags_index))
           {
-            title = (char *)splt_tu_get_tags_field(state,tags_index, SPLT_TAGS_TITLE);
-            splt_su_clean_string(state, title, &error);
-            if (error < 0) { goto end; };
+            title = splt_tu_get_tags_field(state, tags_index, SPLT_TAGS_TITLE);
           }
           else
           {
@@ -734,7 +761,10 @@ put_value:
           //
           if (title != NULL)
           {
-            snprintf(fm, fm_length, temp, title);
+            char *dup = duplicate_and_clean(state, title, &error);
+            if (!dup) { goto end; }
+            snprintf(fm, fm_length, temp, dup);
+            free(dup);
           }
           else
           {
@@ -744,9 +774,7 @@ put_value:
         case 'p':
           if (splt_tu_tags_exists(state,tags_index))
           {
-            performer = (char *)splt_tu_get_tags_field(state,tags_index, SPLT_TAGS_PERFORMER);
-            splt_su_clean_string(state, performer, &error);
-            if (error < 0) { goto end; };
+            performer = splt_tu_get_tags_field(state, tags_index, SPLT_TAGS_PERFORMER);
           }
           else
           {
@@ -776,7 +804,10 @@ put_value:
 
           if (performer != NULL)
           {
-            snprintf(fm, fm_length, temp, performer);
+            char *dup = duplicate_and_clean(state, performer, &error);
+            if (!dup) { goto end; }
+            snprintf(fm, fm_length, temp, dup);
+            free(dup);
           }
           else
           {
@@ -808,8 +839,8 @@ put_value:
           {
             if (splt_tu_tags_exists(state, tags_index))
             {
-              int *tags_track = (int *)splt_tu_get_tags_field(state, tags_index, SPLT_TAGS_TRACK);
-              if (tags_track && *tags_track > 0)
+              const int *tags_track = splt_tu_get_tags_field(state, tags_index, SPLT_TAGS_TRACK);
+              if (tags_track && *tags_track != -1)
               {
                 tracknumber = *tags_track;
               }
@@ -827,7 +858,8 @@ put_value:
           int is_numeric = toupper(state->oformat.format[i][1]) == 'N';
           if (is_numeric)
           {
-            const char *format = splt_u_get_format_ptr(state->oformat.format[i], temp);
+            const char *format =
+              splt_u_get_format_ptr(state->oformat.format[i], temp, NULL);
 
             snprintf(temp + 4, temp_len, format + 2);
             fm_length = strlen(temp) + 1 + max_num_of_digits;
@@ -844,14 +876,24 @@ put_value:
           }
           memset(fm, '\0', fm_length);
 
-          if (is_numeric)
+          if (tracknumber == -2)
           {
-            snprintf(fm, fm_length, temp, tracknumber);
+            temp[1] = 's';
+            temp[2] = '%';
+            temp[3] = 's';
+            snprintf(fm, fm_length, temp, "", "");
           }
           else
           {
-            splt_u_alpha_track(state, i, fm, fm_length,
-                alpha_requested_num_of_digits, tracknumber);
+            if (is_numeric)
+            {
+              snprintf(fm, fm_length, temp, tracknumber);
+            }
+            else
+            {
+              splt_u_alpha_track(state, i, fm, fm_length,
+                  alpha_requested_num_of_digits, tracknumber);
+            }
           }
           break;
         case 'f':
@@ -918,8 +960,7 @@ put_value:
     else
     {
       output_filename_size += fm_size+1;
-      if ((output_filename = realloc(output_filename, output_filename_size
-              * sizeof(char))) == NULL)
+      if ((output_filename = realloc(output_filename, output_filename_size * sizeof(char))) == NULL)
       {
         error = SPLT_ERROR_CANNOT_ALLOCATE_MEMORY;
         goto end;
@@ -962,5 +1003,58 @@ end:
   }
 
   return error;
+}
+
+static void splt_of_trim_on_separator_characters(char *filename)
+{
+  if (!filename)
+  {
+    return;
+  }
+
+  int last_index = strlen(filename)-1;
+  if (last_index < 0)
+  {
+    return;
+  }
+
+  while (last_index >= 0)
+  {
+    char last_char = filename[last_index];
+    if (last_char == ':' || last_char == '_' ||
+        last_char == '-' || last_char == '.')
+    {
+      filename[last_index] = '\0';
+    }
+    else
+    {
+      return;
+    }
+
+    last_index--;
+  }
+}
+
+static const char *splt_of_goto_last_non_separator_character(const char *format)
+{
+  if (!format)
+  {
+    return format;
+  }
+
+  int counter = 0;
+  int max_length = strlen(format);
+  while (counter < max_length)
+  {
+    if (format[counter] == ':' || format[counter] == '_' ||
+        format[counter] == '-' || format[counter] == '.')
+    {
+      break;
+    }
+
+    counter++;
+  }
+
+  return format + counter;
 }
 

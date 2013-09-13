@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -294,8 +293,7 @@ static int splt_p_scan_dir_for_plugins(splt_state *state, splt_plugins *pl, cons
       }
       memset(pl->data[pl->number_of_plugins_found].func, 0, sizeof(splt_plugin_func));
 
-      splt_su_copy(dir_and_fname, 
-          &pl->data[pl->number_of_plugins_found].plugin_filename);
+      splt_su_copy(dir_and_fname, &pl->data[pl->number_of_plugins_found].plugin_filename);
 
       pl->number_of_plugins_found++;
 
@@ -414,6 +412,8 @@ static void splt_p_free_plugin_data(splt_plugin_data *pl_data)
 int splt_p_move_replace_plugin_data(splt_state *state, int old, int new)
 {
   splt_plugins *pl = state->plug;
+  fprintf(stdout, "move old %d to new %d\n", old, new);
+  fflush(stdout);
 
   splt_p_free_plugin_data(&pl->data[new]);
 
@@ -443,6 +443,12 @@ static int splt_p_shift_left_plugins_data(splt_state *state, int index)
 {
   int i = 0;
   splt_plugins *pl = state->plug;
+
+  if (index == pl->number_of_plugins_found - 1)
+  {
+    splt_p_free_plugin_data(&pl->data[index]);
+    return SPLT_OK;
+  }
 
   for (i = index+1;i < pl->number_of_plugins_found;i++)
   {
@@ -497,11 +503,11 @@ static int splt_p_open_get_valid_plugins(splt_state *state)
     {
       splt_d_print_debug(state," - success !\n");
 
-      pl->data[i].func->set_plugin_info =
+      pl->data[i].func->splt_pl_set_plugin_info =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_set_plugin_info");
-      if (pl->data[i].func->set_plugin_info != NULL)
+      if (pl->data[i].func->splt_pl_set_plugin_info != NULL)
       {
-        pl->data[i].func->set_plugin_info(&pl->data[i].info,&error);
+        pl->data[i].func->splt_pl_set_plugin_info(&pl->data[i].info,&error);
       }
 
       //look if we already have a plugin with the same name
@@ -610,34 +616,34 @@ int splt_p_find_get_plugins_data(splt_state *state)
     {
       pl->data[i].plugin_handle = lt_dlopen(pl->data[i].plugin_filename);
 
-      pl->data[i].func->check_plugin_is_for_file =
+      pl->data[i].func->splt_pl_check_plugin_is_for_file =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_check_plugin_is_for_file");
-      pl->data[i].func->search_syncerrors =
+      pl->data[i].func->splt_pl_search_syncerrors =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_search_syncerrors");
-      pl->data[i].func->dewrap =
+      pl->data[i].func->splt_pl_dewrap =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_dewrap");
-      pl->data[i].func->simple_split =
-        lt_dlsym(pl->data[i].plugin_handle, "splt_pl_simple_split");
-      pl->data[i].func->split =
+      pl->data[i].func->splt_pl_offset_split =
+        lt_dlsym(pl->data[i].plugin_handle, "splt_pl_offset_split");
+      pl->data[i].func->splt_pl_split =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_split");
-      pl->data[i].func->init =
+      pl->data[i].func->splt_pl_init =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_init");
-      pl->data[i].func->end =
+      pl->data[i].func->splt_pl_end =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_end");
-      pl->data[i].func->scan_silence =
+      pl->data[i].func->splt_pl_scan_silence =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_scan_silence");
-      pl->data[i].func->scan_trim_silence =
+      pl->data[i].func->splt_pl_scan_trim_silence =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_scan_trim_silence");
-      pl->data[i].func->set_original_tags =
+      pl->data[i].func->splt_pl_set_original_tags =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_set_original_tags");
-      pl->data[i].func->clear_original_tags =
+      pl->data[i].func->splt_pl_clear_original_tags =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_clear_original_tags");
-      pl->data[i].func->set_plugin_info =
+      pl->data[i].func->splt_pl_set_plugin_info =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_set_plugin_info");
-      if (pl->data[i].func->set_plugin_info != NULL)
+      if (pl->data[i].func->splt_pl_set_plugin_info != NULL)
       {
         splt_p_free_plugin_data_info(&pl->data[i]);
-        pl->data[i].func->set_plugin_info(&pl->data[i].info,&err);
+        pl->data[i].func->splt_pl_set_plugin_info(&pl->data[i].info,&err);
       }
 
       splt_p_set_current_plugin(state, i);
@@ -736,9 +742,9 @@ int splt_p_check_plugin_is_for_file(splt_state *state, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->check_plugin_is_for_file != NULL)
+    if (pl->data[current_plugin].func->splt_pl_check_plugin_is_for_file != NULL)
     {
-      return pl->data[current_plugin].func->check_plugin_is_for_file(state, error);
+      return pl->data[current_plugin].func->splt_pl_check_plugin_is_for_file(state, error);
     }
     else
     {
@@ -759,10 +765,10 @@ void splt_p_search_syncerrors(splt_state *state, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->search_syncerrors != NULL)
+    if (pl->data[current_plugin].func->splt_pl_search_syncerrors != NULL)
     {
       splt_se_serrors_free(state);
-      pl->data[current_plugin].func->search_syncerrors(state, error);
+      pl->data[current_plugin].func->splt_pl_search_syncerrors(state, error);
     }
     else
     {
@@ -782,9 +788,9 @@ void splt_p_dewrap(splt_state *state, int listonly, const char *dir, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->dewrap != NULL)
+    if (pl->data[current_plugin].func->splt_pl_dewrap != NULL)
     {
-      pl->data[current_plugin].func->dewrap(state, listonly, dir, error);
+      pl->data[current_plugin].func->splt_pl_dewrap(state, listonly, dir, error);
     }
     else
     {
@@ -812,9 +818,9 @@ double splt_p_split(splt_state *state, const char *final_fname, double begin_poi
     splt_io_create_output_dirs_if_necessary(state, final_fname, &err);
     if (err < 0) { *error = err; return end_point; }
 
-    if (pl->data[current_plugin].func->split != NULL)
+    if (pl->data[current_plugin].func->splt_pl_split != NULL)
     {
-      double new_end_point = pl->data[current_plugin].func->split(state, final_fname,
+      double new_end_point = pl->data[current_plugin].func->splt_pl_split(state, final_fname,
           begin_point, end_point, error, save_end_point);
 
       splt_d_print_debug(state, "New end point after split = _%lf_\n", new_end_point);
@@ -841,9 +847,9 @@ void splt_p_init(splt_state *state, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->init != NULL)
+    if (pl->data[current_plugin].func->splt_pl_init != NULL)
     {
-      pl->data[current_plugin].func->init(state, error);
+      pl->data[current_plugin].func->splt_pl_init(state, error);
     }
     else
     {
@@ -863,9 +869,9 @@ void splt_p_end(splt_state *state, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->end != NULL)
+    if (pl->data[current_plugin].func->splt_pl_end != NULL)
     {
-      pl->data[current_plugin].func->end(state, error);
+      pl->data[current_plugin].func->splt_pl_end(state, error);
     }
     else
     {
@@ -887,9 +893,9 @@ int splt_p_simple_split(splt_state *state, const char *output_fname, off_t begin
   }
   else
   {
-    if (pl->data[current_plugin].func->simple_split != NULL)
+    if (pl->data[current_plugin].func->splt_pl_offset_split != NULL)
     {
-      error = pl->data[current_plugin].func->simple_split(state, output_fname, begin, end);
+      error = pl->data[current_plugin].func->splt_pl_offset_split(state, output_fname, begin, end);
     }
     else
     {
@@ -911,9 +917,9 @@ int splt_p_scan_silence(splt_state *state, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->scan_silence != NULL)
+    if (pl->data[current_plugin].func->splt_pl_scan_silence != NULL)
     {
-      return pl->data[current_plugin].func->scan_silence(state, error);
+      return pl->data[current_plugin].func->splt_pl_scan_silence(state, error);
     }
     else
     {
@@ -935,9 +941,9 @@ int splt_p_scan_trim_silence(splt_state *state, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->scan_trim_silence != NULL)
+    if (pl->data[current_plugin].func->splt_pl_scan_trim_silence != NULL)
     {
-      return pl->data[current_plugin].func->scan_trim_silence(state, error);
+      return pl->data[current_plugin].func->splt_pl_scan_trim_silence(state, error);
     }
     else
     {
@@ -950,6 +956,8 @@ int splt_p_scan_trim_silence(splt_state *state, int *error)
 
 void splt_p_set_original_tags(splt_state *state, int *error)
 {
+  splt_tu_set_original_tags_last_plugin_used(state, -100);
+
   splt_plugins *pl = state->plug;
   int current_plugin = splt_p_get_current_plugin(state);
   if ((current_plugin < 0) || (current_plugin >= pl->number_of_plugins_found))
@@ -959,9 +967,10 @@ void splt_p_set_original_tags(splt_state *state, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->set_original_tags != NULL)
+    if (pl->data[current_plugin].func->splt_pl_set_original_tags != NULL)
     {
-      pl->data[current_plugin].func->set_original_tags(state, error);
+      splt_tu_set_original_tags_last_plugin_used(state, current_plugin);
+      pl->data[current_plugin].func->splt_pl_set_original_tags(state, error);
     }
   }
 }
@@ -969,7 +978,12 @@ void splt_p_set_original_tags(splt_state *state, int *error)
 void splt_p_clear_original_tags(splt_state *state, int *error)
 {
   splt_plugins *pl = state->plug;
-  int current_plugin = splt_p_get_current_plugin(state);
+  int current_plugin = splt_tu_get_original_tags_last_plugin_used(state);
+  if (current_plugin == -100)
+  {
+    return;
+  }
+
   if ((current_plugin < 0) || (current_plugin >= pl->number_of_plugins_found))
   {
     *error = SPLT_ERROR_NO_PLUGIN_FOUND;
@@ -977,9 +991,9 @@ void splt_p_clear_original_tags(splt_state *state, int *error)
   }
   else
   {
-    if (pl->data[current_plugin].func->clear_original_tags != NULL)
+    if (pl->data[current_plugin].func->splt_pl_clear_original_tags != NULL)
     {
-      pl->data[current_plugin].func->clear_original_tags(&state->original_tags);
+      pl->data[current_plugin].func->splt_pl_clear_original_tags(&state->original_tags);
     }
   }
 }

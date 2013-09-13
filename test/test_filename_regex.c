@@ -24,7 +24,7 @@ void cut_setup()
 
 void cut_teardown()
 {
-  mp3splt_free_state(state, NULL);
+  mp3splt_free_state(state);
   splt_tu_free_one_tags(&tags);
   tags = NULL;
 }
@@ -41,14 +41,27 @@ void test_all_fields_no_conversion()
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
 
-  cut_assert_equal_string("artist", tags->artist);
-  cut_assert_equal_string("geek", tags->title);
-  cut_assert_equal_string("album", tags->album);
-  cut_assert_equal_string("comment", tags->comment);
-  cut_assert_equal_string("2007", tags->year);
-  cut_assert_equal_int(2, tags->track);
-  cut_assert_equal_string("Slow Rock", tags->genre);
-  //tags->total_tracks
+  char *artist = mp3splt_tags_get(tags, SPLT_TAGS_ARTIST);
+  cut_assert_equal_string("artist", artist);
+  free(artist);
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("geek", title);
+  free(title);
+  char *album = mp3splt_tags_get(tags, SPLT_TAGS_ALBUM);
+  cut_assert_equal_string("album", album);
+  free(album);
+  char *comment = mp3splt_tags_get(tags, SPLT_TAGS_COMMENT);
+  cut_assert_equal_string("comment", comment);
+  free(comment);
+  char *year = mp3splt_tags_get(tags, SPLT_TAGS_YEAR);
+  cut_assert_equal_string("2007", year);
+  free(year);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("2", track);
+  free(track);
+  char *genre = mp3splt_tags_get(tags, SPLT_TAGS_GENRE);
+  cut_assert_equal_string("Slow Rock", genre);
+  free(genre);
 }
 
 void test_all_fields_to_uppercase()
@@ -66,14 +79,27 @@ void test_all_fields_to_uppercase()
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
 
-  cut_assert_equal_string("ARTIST", tags->artist);
-  cut_assert_equal_string("GEEK", tags->title);
-  cut_assert_equal_string("ALBUM", tags->album);
-  cut_assert_equal_string("COMMENT", tags->comment);
-  cut_assert_equal_string("2007", tags->year);
-  cut_assert_equal_int(2, tags->track);
-  cut_assert_equal_string("Slow Rock", tags->genre);
-  //tags->total_tracks
+  char *artist = mp3splt_tags_get(tags, SPLT_TAGS_ARTIST);
+  cut_assert_equal_string("ARTIST", artist);
+  free(artist);
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("GEEK", title);
+  free(title);
+  char *album = mp3splt_tags_get(tags, SPLT_TAGS_ALBUM);
+  cut_assert_equal_string("ALBUM", album);
+  free(album);
+  char *comment = mp3splt_tags_get(tags, SPLT_TAGS_COMMENT);
+  cut_assert_equal_string("COMMENT", comment);
+  free(comment);
+  char *year = mp3splt_tags_get(tags, SPLT_TAGS_YEAR);
+  cut_assert_equal_string("2007", year);
+  free(year);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("2", track);
+  free(track);
+  char *genre = mp3splt_tags_get(tags, SPLT_TAGS_GENRE);
+  cut_assert_equal_string("Slow Rock", genre);
+  free(genre);
 }
 
 void test_all_fields_to_lowercase()
@@ -90,14 +116,27 @@ void test_all_fields_to_lowercase()
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
 
-  cut_assert_equal_string("artist", tags->artist);
-  cut_assert_equal_string("geek", tags->title);
-  cut_assert_equal_string("album", tags->album);
-  cut_assert_equal_string("comment", tags->comment);
-  cut_assert_equal_string("2007", tags->year);
-  cut_assert_equal_int(2, tags->track);
-  cut_assert_equal_string("Slow Rock", tags->genre);
-  //tags->total_tracks
+  char *artist = mp3splt_tags_get(tags, SPLT_TAGS_ARTIST);
+  cut_assert_equal_string("artist", artist);
+  free(artist);
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("geek", title);
+  free(title);
+  char *album = mp3splt_tags_get(tags, SPLT_TAGS_ALBUM);
+  cut_assert_equal_string("album", album);
+  free(album);
+  char *comment = mp3splt_tags_get(tags, SPLT_TAGS_COMMENT);
+  cut_assert_equal_string("comment", comment);
+  free(comment);
+  char *year = mp3splt_tags_get(tags, SPLT_TAGS_YEAR);
+  cut_assert_equal_string("2007", year);
+  free(year);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("2", track);
+  free(track);
+  char *genre = mp3splt_tags_get(tags, SPLT_TAGS_GENRE);
+  cut_assert_equal_string("Slow Rock", genre);
+  free(genre);
 }
 
 void test_all_fields_to_first_uppercase()
@@ -114,13 +153,27 @@ void test_all_fields_to_first_uppercase()
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
 
-  cut_assert_equal_string("ArTist good", tags->artist);
-  cut_assert_equal_string("GEEK", tags->title);
-  cut_assert_equal_string("AlBum", tags->album);
-  cut_assert_equal_string("CoMMent", tags->comment);
-  cut_assert_equal_string("2007", tags->year);
-  cut_assert_equal_int(2, tags->track);
-  cut_assert_equal_string("Tango", tags->genre);
+  char *artist = mp3splt_tags_get(tags, SPLT_TAGS_ARTIST);
+  cut_assert_equal_string("ArTist good", artist);
+  free(artist);
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("GEEK", title);
+  free(title);
+  char *album = mp3splt_tags_get(tags, SPLT_TAGS_ALBUM);
+  cut_assert_equal_string("AlBum", album);
+  free(album);
+  char *comment = mp3splt_tags_get(tags, SPLT_TAGS_COMMENT);
+  cut_assert_equal_string("CoMMent", comment);
+  free(comment);
+  char *year = mp3splt_tags_get(tags, SPLT_TAGS_YEAR);
+  cut_assert_equal_string("2007", year);
+  free(year);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("2", track);
+  free(track);
+  char *genre = mp3splt_tags_get(tags, SPLT_TAGS_GENRE);
+  cut_assert_equal_string("Tango", genre);
+  free(genre);
   //tags->total_tracks
 }
 
@@ -138,13 +191,27 @@ void test_all_fields_to_word_first_uppercase()
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
 
-  cut_assert_equal_string("ArTist Good", tags->artist);
-  cut_assert_equal_string("GEEK Y", tags->title);
-  cut_assert_equal_string("AlBum Second", tags->album);
-  cut_assert_equal_string("CoMMent This", tags->comment);
-  cut_assert_equal_string("2007", tags->year);
-  cut_assert_equal_int(2, tags->track);
-  cut_assert_equal_string("Tango", tags->genre);
+  char *artist = mp3splt_tags_get(tags, SPLT_TAGS_ARTIST);
+  cut_assert_equal_string("ArTist Good", artist);
+  free(artist);
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("GEEK Y", title);
+  free(title);
+  char *album = mp3splt_tags_get(tags, SPLT_TAGS_ALBUM);
+  cut_assert_equal_string("AlBum Second", album);
+  free(album);
+  char *comment = mp3splt_tags_get(tags, SPLT_TAGS_COMMENT);
+  cut_assert_equal_string("CoMMent This", comment);
+  free(comment);
+  char *year = mp3splt_tags_get(tags, SPLT_TAGS_YEAR);
+  cut_assert_equal_string("2007", year);
+  free(year);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("2", track);
+  free(track);
+  char *genre = mp3splt_tags_get(tags, SPLT_TAGS_GENRE);
+  cut_assert_equal_string("Tango", genre);
+  free(genre);
   //tags->total_tracks
 }
 
@@ -174,40 +241,52 @@ void test_no_title_with_total_tracks()
       NO_DEFAULT_COMMENT, NO_DEFAULT_GENRE, &error);
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
-  cut_assert_equal_string("Track 3 of 6", tags->title);
-  cut_assert_equal_int(3, tags->track);
-  //tags->total_tracks
+
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("Track 3 of 6", title);
+  free(title);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("3", track);
+  free(track);
 }
 
 void test_no_title_no_total_tracks()
 {
-  tags = splt_fr_parse(state, "track 3",
-      "track (?<tracknum>.*)",
+  tags = splt_fr_parse(state, "track 3", "track (?<tracknum>.*)",
       NO_DEFAULT_COMMENT, NO_DEFAULT_GENRE, &error);
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
-  cut_assert_equal_string("Track 3", tags->title);
-  cut_assert_equal_int(3, tags->track);
+
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("Track 3", title);
+  free(title);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("3", track);
+  free(track);
 }
 
 void test_default_comment()
 {
-  tags = splt_fr_parse(state, "track 3",
-      "track (?<tracknum>.*)",
+  tags = splt_fr_parse(state, "track 3", "track (?<tracknum>.*)",
       "default_comment", NO_DEFAULT_GENRE, &error);
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
-  cut_assert_equal_string("default_comment", tags->comment);
+
+  char *comment = mp3splt_tags_get(tags, SPLT_TAGS_COMMENT);
+  cut_assert_equal_string("default_comment", comment);
+  free(comment);
 }
 
 void test_default_genre()
 {
-  tags = splt_fr_parse(state, "track 3",
-      "track (?<tracknum>.*)",
+  tags = splt_fr_parse(state, "track 3", "track (?<tracknum>.*)",
       NO_DEFAULT_COMMENT, "Freestyle", &error);
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
-  cut_assert_equal_string("Freestyle", tags->genre);
+
+  char *genre = mp3splt_tags_get(tags, SPLT_TAGS_GENRE);
+  cut_assert_equal_string("Freestyle", genre);
+  free(genre);
 }
 
 
@@ -228,14 +307,27 @@ void test_mixed_formats()
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
 
-  cut_assert_equal_string("ARTIST_GOOD", tags->artist);
-  cut_assert_equal_string("geek", tags->title);
-  cut_assert_equal_string("AlBum", tags->album);
-  cut_assert_equal_string("CoMMent Kk", tags->comment);
-  cut_assert_equal_string("2007", tags->year);
-  cut_assert_equal_int(2, tags->track);
-  cut_assert_equal_string("Tribal", tags->genre);
-  //tags->total_tracks
+  char *artist = mp3splt_tags_get(tags, SPLT_TAGS_ARTIST);
+  cut_assert_equal_string("ARTIST_GOOD", artist);
+  free(artist);
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("geek", title);
+  free(title);
+  char *album = mp3splt_tags_get(tags, SPLT_TAGS_ALBUM);
+  cut_assert_equal_string("AlBum", album);
+  free(album);
+  char *comment = mp3splt_tags_get(tags, SPLT_TAGS_COMMENT);
+  cut_assert_equal_string("CoMMent Kk", comment);
+  free(comment);
+  char *year = mp3splt_tags_get(tags, SPLT_TAGS_YEAR);
+  cut_assert_equal_string("2007", year);
+  free(year);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("2", track);
+  free(track);
+  char *genre = mp3splt_tags_get(tags, SPLT_TAGS_GENRE);
+  cut_assert_equal_string("Tribal", genre);
+  free(genre);
 }
 
 void test_with_replace_underscores()
@@ -257,14 +349,27 @@ void test_with_replace_underscores()
 
   cut_assert_equal_int(SPLT_REGEX_OK, error);
 
-  cut_assert_equal_string("ARTIST GOOD", tags->artist);
-  cut_assert_equal_string("ge ek", tags->title);
-  cut_assert_equal_string("AlBum", tags->album);
-  cut_assert_equal_string("CoMMent Kk", tags->comment);
-  cut_assert_equal_string("2007", tags->year);
-  cut_assert_equal_int(2, tags->track);
-  cut_assert_equal_string("Dance Hall", tags->genre);
-  //tags->total_tracks
+  char *artist = mp3splt_tags_get(tags, SPLT_TAGS_ARTIST);
+  cut_assert_equal_string("ARTIST GOOD", artist);
+  free(artist);
+  char *title = mp3splt_tags_get(tags, SPLT_TAGS_TITLE);
+  cut_assert_equal_string("ge ek", title);
+  free(title);
+  char *album = mp3splt_tags_get(tags, SPLT_TAGS_ALBUM);
+  cut_assert_equal_string("AlBum", album);
+  free(album);
+  char *comment = mp3splt_tags_get(tags, SPLT_TAGS_COMMENT);
+  cut_assert_equal_string("CoMMent Kk", comment);
+  free(comment);
+  char *year = mp3splt_tags_get(tags, SPLT_TAGS_YEAR);
+  cut_assert_equal_string("2007", year);
+  free(year);
+  char *track = mp3splt_tags_get(tags, SPLT_TAGS_TRACK);
+  cut_assert_equal_string("2", track);
+  free(track);
+  char *genre = mp3splt_tags_get(tags, SPLT_TAGS_GENRE);
+  cut_assert_equal_string("Dance Hall", genre);
+  free(genre);
 }
 
 static void set_tags_format_options(splt_state *state, int format)

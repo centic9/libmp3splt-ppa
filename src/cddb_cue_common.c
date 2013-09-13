@@ -3,7 +3,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2010 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  *********************************************************/
 
@@ -20,7 +20,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * 02111-1307, USA.
  *********************************************************/
 
@@ -38,9 +38,10 @@ in common.
   What we deem to be a sensible file name can be controlled by the
   user using the format that is handled by oformat_parser.c
  */
-void splt_cc_put_filenames_from_tags(splt_state *state, int tracks, int *error)
+void splt_cc_put_filenames_from_tags(splt_state *state, int tracks, int *error, 
+    const splt_tags *all_tags, int only_set_name_if_null)
 {
-  int err = splt_tu_copy_first_common_tags_on_all_tracks(state, tracks);
+  int err = splt_tu_copy_tags_on_all_tracks(state, tracks, all_tags);
   if (err < 0) { *error = err; return; }
 
   if (splt_o_get_int_option(state, SPLT_OPT_OUTPUT_FILENAMES) == SPLT_OUTPUT_DEFAULT)
@@ -60,8 +61,12 @@ void splt_cc_put_filenames_from_tags(splt_state *state, int tracks, int *error)
   int current_split = 0;
 
   do {
-    err = splt_u_finish_tags_and_put_output_format_filename(state, current_split);
-    if (err != SPLT_OK) { *error = err; return; }
+    const char *splitpoint_name = splt_sp_get_splitpoint_name(state, current_split, &err);
+    if (!only_set_name_if_null || (splitpoint_name == NULL))
+    {
+      err = splt_u_finish_tags_and_put_output_format_filename(state, current_split);
+      if (err != SPLT_OK) { *error = err; return; }
+    }
 
     splt_t_current_split_next(state);
     current_split = splt_t_get_current_split(state);

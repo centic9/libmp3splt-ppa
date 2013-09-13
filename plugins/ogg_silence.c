@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - <io_fx@yahoo.fr>
+ * Copyright (c) 2005-2013 Alexandru Munteanu - <m@ioalex.net>
  *
  * Parts of this file have been copied from the 'vcut' 1.6
  * program provided with 'vorbis-tools' :
@@ -31,8 +31,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -48,7 +47,7 @@
 
 static void splt_ogg_scan_silence_and_process(splt_state *state, short seconds,
     float max_threshold, ogg_page *page,  ogg_int64_t granpos, ogg_int64_t first_cut_granpos,
-    short process_silence(double time, int silence_was_found, short must_flush,
+    short process_silence(double time, float level, int silence_was_found, short must_flush,
       splt_scan_silence_data *ssd, int *found, int *error),
     splt_scan_silence_data *ssd, int *error);
 static int splt_ogg_silence(splt_ogg_state *oggstate, vorbis_dsp_state *vd, float threshold);
@@ -56,7 +55,7 @@ static int splt_ogg_silence(splt_ogg_state *oggstate, vorbis_dsp_state *vd, floa
 int splt_ogg_scan_silence(splt_state *state, short seconds, float threshold, 
     float min, int shots, short output, ogg_page *page, ogg_int64_t granpos,
     int *error, ogg_int64_t first_cut_granpos,
-    short silence_processor(double time, int silence_was_found, short must_flush,
+    short silence_processor(double time, float level, int silence_was_found, short must_flush,
       splt_scan_silence_data *ssd, int *found, int *error))
 {
   splt_scan_silence_data *ssd = splt_scan_silence_data_new(state, output, min, shots, SPLT_FALSE);
@@ -82,7 +81,7 @@ int splt_ogg_scan_silence(splt_state *state, short seconds, float threshold,
 
 static void splt_ogg_scan_silence_and_process(splt_state *state, short seconds,
     float max_threshold, ogg_page *page,  ogg_int64_t granpos, ogg_int64_t first_cut_granpos,
-    short process_silence(double time, int silence_was_found, short must_flush,
+    short process_silence(double time, float level, int silence_was_found, short must_flush,
       splt_scan_silence_data *ssd, int *found, int *error),
     splt_scan_silence_data *ssd, int *error)
 {
@@ -108,7 +107,7 @@ static void splt_ogg_scan_silence_and_process(splt_state *state, short seconds,
 
   ogg_page og;
 
-  float threshold = splt_co_convert_from_dB(max_threshold);
+  float threshold = splt_co_convert_from_db(max_threshold);
 
   int result = 0;
 
@@ -180,7 +179,8 @@ static void splt_ogg_scan_silence_and_process(splt_state *state, short seconds,
 
       if (result > 0)
       {
-        if (ogg_page_bos(&og))
+        if (ogg_page_bos(&og) &&
+            (oggstate->saved_serial != ogg_page_serialno(&og)))
         {
           splt_ogg_initialise_for_new_stream(ogg_new_stream_handler, &og, NULL, 0);
           oggstate->cutpoint_begin = 0;
@@ -252,7 +252,12 @@ static void splt_ogg_scan_silence_and_process(splt_state *state, short seconds,
             time_in_double = (double) (pos - first_cut_granpos);
             time_in_double /= oggstate->vi->rate;
             time_in_double += previous_streams_time_in_double;
-            int stop = process_silence(time_in_double, silence_was_found, must_flush, ssd, &found, &err);
+
+            float level = splt_co_convert_to_db(oggstate->temp_level);
+            if (level < -96.0) { level = -96.0; }
+            if (level > 0) { level = 0; }
+
+            int stop = process_silence(time_in_double, level, silence_was_found, must_flush, ssd, &found, &err);
             if (stop || stop == -1)
             {
               eos = 1;
@@ -261,6 +266,46 @@ static void splt_ogg_scan_silence_and_process(splt_state *state, short seconds,
               if (stop == -1)
                 break;
             }
+
+            //BEGIN silence callbacks
+            if (state->split.get_silence_level)
+            {
+              long time = (long) (((double) pos / oggstate->vi->rate) * 100.0);
+              if (is_stream && stream_time0 == 0 && time != 0)
+              {
+                stream_time0 = time;
+                //          fprintf(stdout, "stream_time0 = %ld\n", stream_time0);
+                //          fflush(stdout);
+              }
+
+              //        fprintf(stdout, "level = %f, time = %ld, time - stream_time0 = %ld\n", 
+              //            level, time, (long) (time - stream_time0));
+              //        fflush(stdout);
+
+              state->split.get_silence_level(time - stream_time0, level,
+                  state->split.silence_level_client_data);
+            }
+            state->split.p_bar->silence_db_level = level;
+            state->split.p_bar->silence_found_tracks = found;
+
+            if (option_silence_mode)
+            {
+              if (splt_t_split_is_canceled(state))
+              {
+                eos = 1;
+              }
+              splt_c_update_progress(state,(double)pos * 100,
+                  (double)(oggstate->len), 1,0,SPLT_DEFAULT_PROGRESS_RATE2);
+            }
+            else
+            {
+              //fprintf(stdout, "%lf/%lf\n", (double)begin, (double)end);
+              //fflush(stdout);
+              //TODO: bug
+              splt_c_update_progress(state,(double)begin, (double)end, 4, 0.5, SPLT_DEFAULT_PROGRESS_RATE2);
+            }
+            //END silence callbacks
+
           }
         }
       }
@@ -291,47 +336,12 @@ static void splt_ogg_scan_silence_and_process(splt_state *state, short seconds,
 //        fprintf(stdout,"Y page number = %ld\n", page_number);
 //        fflush(stdout);
 //      }
-
-      float level = splt_co_convert_to_dB(oggstate->temp_level);
-      if (state->split.get_silence_level)
-      {
-        long time = (long) (((double) pos / oggstate->vi->rate) * 100.0);
-        if (is_stream && stream_time0 == 0 && time != 0)
-        {
-          stream_time0 = time;
-//          fprintf(stdout, "stream_time0 = %ld\n", stream_time0);
-//          fflush(stdout);
-        }
-
-//        fprintf(stdout, "level = %f, time = %ld, time - stream_time0 = %ld\n", 
-//            level, time, (long) (time - stream_time0));
-//        fflush(stdout);
-
-        state->split.get_silence_level(time - stream_time0, level,
-            state->split.silence_level_client_data);
-      }
-      state->split.p_bar->silence_db_level = level;
-      state->split.p_bar->silence_found_tracks = found;
-
-      if (option_silence_mode)
-      {
-        if (splt_t_split_is_canceled(state))
-        {
-          eos = 1;
-        }
-        splt_c_update_progress(state,(double)pos * 100,
-            (double)(oggstate->len), 1,0,SPLT_DEFAULT_PROGRESS_RATE2);
-      }
-      else
-      {
-        splt_c_update_progress(state,(double)begin, (double)end, 2,0.5,SPLT_DEFAULT_PROGRESS_RATE2);
-      }
     }
   }
 
   int junk;
   int err = SPLT_OK;
-  process_silence(-1, SPLT_FALSE, SPLT_FALSE, ssd, &junk, &err);
+  process_silence(-1, -96, SPLT_FALSE, SPLT_FALSE, ssd, &junk, &err);
   if (err < 0) { *error = err; }
 
 function_end:
@@ -380,7 +390,8 @@ static int splt_ogg_silence(splt_ogg_state *oggstate, vorbis_dsp_state *vd, floa
         }
         for(j = 0; j < samples; j++)
         {
-          sample = fabs(mono[j]);
+          float single_mono = mono[j];
+          sample = fabs(single_mono);
           oggstate->temp_level = oggstate->temp_level * 0.999 + sample * 0.001;
           if (sample > threshold)
           {

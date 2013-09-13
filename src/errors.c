@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -46,8 +45,6 @@ that is meant to be used directly are all in mp3splt.c.
 #endif
 
 #include "splt.h"
-
-static void splt_e_set_strerr_msg(splt_state *state, const char *message);
 
 void splt_e_set_errors_default_values(splt_state *state)
 {
@@ -244,6 +241,9 @@ char *splt_e_strerror(splt_state *state, splt_code error_code)
       return splt_su_get_formatted_message(state,
           _(" freedb error: cannot receive message from server '%s' (%s)"),
           state->err.error_data, state->err.strerror_msg);
+    case SPLT_FREEDB_ERROR_PROXY_NOT_SUPPORTED:
+      return splt_su_get_formatted_message(state,
+          _(" proxy not supported with this type of protocol"));
     case SPLT_INVALID_CUE_FILE:
       return splt_su_get_formatted_message(state, _(" cue error: invalid cue file '%s'"),
           state->err.error_data);
@@ -255,7 +255,7 @@ char *splt_e_strerror(splt_state *state, splt_code error_code)
           _(" freedb error: No such CD entry in database"));
     case SPLT_FREEDB_ERROR_SITE:
       return splt_su_get_formatted_message(state,
-          _(" freedb error: site returned an unknown error"));
+          _(" freedb error: bad response from remote host"));
       //
     case SPLT_DEWRAP_OK:
       return splt_su_get_formatted_message(state, _(" wrap split ok"));
@@ -442,7 +442,7 @@ char *splt_e_strerror(splt_state *state, splt_code error_code)
   return NULL;
 }
 
-static void splt_e_set_strerr_msg(splt_state *state, const char *message)
+void splt_e_set_strerr_msg(splt_state *state, const char *message)
 {
   splt_su_copy(message, &state->err.strerror_msg);
 }

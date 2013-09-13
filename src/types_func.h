@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Munteanu Alexandru - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Munteanu Alexandru - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -61,6 +60,9 @@ char *splt_t_get_default_genre_tag(splt_state *state);
 
 int splt_t_set_silence_log_fname(splt_state *state, const char *filename);
 char *splt_t_get_silence_log_fname(splt_state *state);
+int splt_t_set_silence_full_log_fname(splt_state *state, const char *filename);
+char *splt_t_get_silence_full_log_fname(splt_state *state);
+FILE *splt_t_get_silence_full_log_file_descriptor(splt_state *state);
 
 int splt_t_set_filename_to_split(splt_state *state, const char *filename);
 char *splt_t_get_filename_to_split(splt_state *state);
@@ -81,6 +83,8 @@ void splt_t_clean_split_data(splt_state *state,int tracks);
 
 int splt_t_split_is_canceled(splt_state *state);
 void splt_t_set_stop_split(splt_state *state, int bool_value);
+
+void splt_t_set_current_split_file_number_next(splt_state *state);
 
 #define SPLT_TYPES_FUNC_H
 

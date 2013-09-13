@@ -3,7 +3,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  *********************************************************/
 
@@ -20,7 +20,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * 02111-1307, USA.
  *********************************************************/
 
@@ -51,142 +51,6 @@ that is meant to be used directly are all in mp3splt.c.
 #define DONT_SKIP_LINES 0
 #define SKIP_ONE_LINE 1
 
-#if defined(__BEOS__) && !defined (HAS_GETPASS)
-//used for proxy (proxy not implemented)
-//#warning Faking getpass() !!!
-//char *getpass(char *p)
-//{
-//      char *ret;
-//      ret = malloc(30);
-//      if (!ret)
-//              return NULL;
-//      puts(p);
-//      fgets(ret,30,stdin);
-//      return ret;
-//}
-#endif
-
-// The alphabet fpr the base64 algorithm - for proxy (proxy not implemented)
-//
-// Base64 Algorithm: Base64.java v. 1.3.6 by Robert Harder
-// Ported and optimized for C by Matteo Trotta
-//
-//const char alphabet [] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-//char *encode3to4 (unsigned char *source, int srcoffset, int num, char *destination, int destoffset)
-//{
-//
-//    int inbuff=(num>0?(source[srcoffset]<<16):0)|(num>1?(source[srcoffset+1]<<8):0)|(num>2?(source[srcoffset+2]):0);
-//    switch(num)
-//    {
-//      case 3:
-//          destination[destoffset] = alphabet[(inbuff>>18)];
-//          destination[destoffset+1] = alphabet[(inbuff>>12)&0x3f];
-//          destination[destoffset+2] = alphabet[(inbuff>>6)&0x3f];
-//          destination[destoffset+3] = alphabet[(inbuff)&0x3f];
-//          return destination;
-//
-//      case 2:
-//          destination[destoffset] = alphabet[(inbuff>>18)];
-//          destination[destoffset+1] = alphabet[(inbuff>>12)&0x3f];
-//          destination[destoffset+2] = alphabet[(inbuff>>6)&0x3f];
-//          destination[destoffset+3] = '=';
-//          return destination;
-//
-//      case 1:
-//          destination[destoffset] = alphabet[(inbuff>>18)];
-//          destination[destoffset+1] = alphabet[(inbuff>>12)&0x3f];
-//          destination[destoffset+2] = '=';
-//          destination[destoffset+3] = '=';
-//          return destination;
-//      default:
-//          return destination;
-//    }
-//}
-
-//used for proxy (proxy not implemented)
-//char *b64 (unsigned char *source, int len)
-//{
-//      char *out;
-//      int d, e=0;
-//      d = ((len*4/3)+((len%3)>0?4:0));
-//      
-//      out = malloc(d+1);
-//      
-//      memset(out, 0x00, d+1);
-//      for(d=0;d<(len-2);d+=3,e+=4)
-//              out = encode3to4(source, d, 3, out, e);
-//      if(d<len)
-//              out = encode3to4(source, d, len-d, out, e);
-//
-//      return out;
-//}
-// End of Base64 Algorithm
-
-//char *login (char *s)
-//{
-//      char *pass, junk[130];
-//      fprintf (stdout, "Username: ");
-//      fgets(junk, 128, stdin);
-//      junk[strlen(junk)-1]='\0';
-//      pass = getpass("Password: ");
-//      sprintf (s, "%s:%s", junk, pass);
-//      memset (pass, 0x00, strlen(pass));
-//      free(pass);
-//      return s;
-//}
-
-/*static splt_addr splt_freedb_useproxy(splt_proxy *proxy, splt_addr dest,
-    const char search_server[256], int port)
-{
-  dest.proxy=0;
-  memset(dest.hostname, 0, 256);
-  //memset(line, 0, 270);
-
-  //if (proxy->use_proxy)
-  if (proxy)
-  {
-    //TODO
-    strncpy(dest.hostname, proxy->hostname, 255);
-    dest.port = proxy->port;
-    dest.proxy = proxy->use_proxy;
-
-    fprintf(stderr, "Using Proxy: %s on Port %d\n", dest.hostname, dest.port);
-
-    dest.auth = malloc(strlen(line)+1);
-    if (dest.auth==NULL)
-    {
-      perror("malloc");
-      exit(1);
-    }
-    memset(dest.auth, 0x0, strlen(line)+1);
-    strncpy(dest.auth, line, strlen(line));
-    //dest.auth = b64(line, strlen(line));
-  }
-
-  if (!dest.proxy) 
-  {
-    if (strlen(search_server) == 0)
-    {
-      strncpy(dest.hostname, SPLT_FREEDB2_SITE, 255);
-    }
-    else
-    {
-      strncpy(dest.hostname, search_server, 255);
-    }
-
-    if (port == -1)
-    {
-      dest.port = SPLT_FREEDB_CDDB_CGI_PORT;
-    }
-    else
-    {
-      dest.port = port;
-    }      
-  }
-
-  return dest;
-}*/
-
 char *get_cgi_path_and_cut_server(int type, const char *search_server)
 {
   char *cgi_path = NULL;
@@ -200,7 +64,7 @@ char *get_cgi_path_and_cut_server(int type, const char *search_server)
   if (type == SPLT_FREEDB_SEARCH_TYPE_CDDB_CGI ||
       type == SPLT_FREEDB_GET_FILE_TYPE_CDDB_CGI)
   {
-    char *path = strchr(search_server,'/');
+    char *path = strchr(search_server, '/');
     if (path)
     {
       splt_su_copy(path, &cgi_path);
@@ -322,7 +186,7 @@ int splt_freedb_process_search(splt_state *state, char *search,
     err = splt_fu_freedb_init_search(state);
     if (err < 0) { error = err; goto disconnect; }
 
-    splt_sm_receive_and_process_without_headers(sh, state,
+    splt_sm_receive_and_process_without_headers(sh, state, 
         splt_freedb_search_result_processor, state, SKIP_ONE_LINE);
     if (sh->error < 0) { error = sh->error; goto disconnect; }
   }
@@ -495,6 +359,12 @@ char *splt_freedb_get_file(splt_state *state, int disc_id, int *error,
   }
   else if (get_type == SPLT_FREEDB_GET_FILE_TYPE_CDDB)
   {
+    if (splt_pr_has_proxy(state))
+    {
+      *error = SPLT_FREEDB_ERROR_PROXY_NOT_SUPPORTED;
+      goto disconnect;
+    }
+
     get_file->stop_on_dot = SPLT_TRUE;
 
     splt_sm_send_http_message(sh, SPLT_FREEDB_HELLO, state);
@@ -512,6 +382,9 @@ char *splt_freedb_get_file(splt_state *state, int disc_id, int *error,
 
     splt_sm_receive_and_process(sh, state, splt_freedb_process_get_file, get_file);
     if (get_file->err < 0) { *error = get_file->err; goto disconnect; }
+    if (sh->error < 0) { *error = sh->error; goto disconnect; }
+
+    splt_sm_send_http_message(sh, "quit", state);
     if (sh->error < 0) { *error = sh->error; goto disconnect; }
   }
 
@@ -551,61 +424,3 @@ end:
   return NULL;
 }
 
-  //deprecated, and not in use
-  //but may useful for the implementation of the proxy
-  /*int search_freedb (splt_state *state)
-    {
-    char *c, *e=NULL;
-    FILE *output = NULL;
-    struct sockaddr_in host;
-    struct hostent *h;
-    struct splt_addr dest;
-
-    if ((c=getenv("HOME"))!=NULL) sprintf(message, "%s/"PROXYCONFIG, c);
-    else strncpy(message, PROXYCONFIG, strlen(PROXYCONFIG));
-
-    if (!(output=splt_io_fopen(message, "r"))) {
-    if (!(output=splt_io_fopen(message, "w+"))) {
-    fprintf(stderr, "\nWARNING Can't open config file ");
-    perror(message);
-    }
-    else {
-    fprintf (stderr, "Will you use a proxy? (y/n): ");
-    fgets(junk, 200, stdin);
-    if (junk[0]=='y') {
-    fprintf (stderr, "Proxy Address: ");
-    fgets(junk, 200, stdin);
-    fprintf (output, "PROXYADDR=%s", junk);
-    fprintf (stderr, "Proxy Port: ");
-    fgets(junk, 200, stdin);
-    fprintf (output, "PROXYPORT=%s", junk);
-    fprintf (stderr, "Need authentication? (y/n): ");
-    fgets(junk, 200, stdin);
-    if (junk[0]=='y') {
-    fprintf (output, "PROXYAUTH=1\n");
-    fprintf (stderr, "Would you like to save password (insecure)? (y/n): ");
-    fgets(junk, 200, stdin);
-    if (junk[0]=='y') {
-    login (message);
-    e = b64(message, strlen(message));
-    fprintf (output, "%s\n", e);
-    memset(message, 0x00, strlen(message));
-    memset(e, 0x00, strlen(e));
-    free(e);
-    }
-    }
-    }
-    }
-    }
-        
-    if (splt_fu_freedb_get_found_cds(state)<=0) {
-    if (dest.proxy) {
-    if (strstr(buffer, "HTTP/1.0")!=NULL) {
-    if ((c = strchr (buffer, '\n'))!=NULL)
-    buffer[c-buffer]='\0';
-    fprintf (stderr, "Proxy Reply: %s\n", buffer);
-    }
-    }
-    }
-    return 0;
-    }*/

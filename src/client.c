@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -45,7 +44,7 @@ int splt_c_put_split_file(splt_state *state, const char *filename)
 
   if (state->split.file_split != NULL)
   {
-    state->split.file_split(filename, state->split.p_bar->user_data);
+    state->split.file_split(filename, state->split.file_split_cb_data);
     error = splt_c_append_to_m3u_file(state, filename);
   }
   else
@@ -126,7 +125,7 @@ void splt_c_update_progress(splt_state *state, double current_point,
       p_bar->percent_progress = 1;
     }
 
-    p_bar->progress(p_bar);
+    p_bar->progress(p_bar, p_bar->progress_cb_data);
     splt_o_set_iopt(state, SPLT_INTERNAL_PROGRESS_RATE, 0);
   }
   else
@@ -143,7 +142,7 @@ static void splt_c_put_message_to_client(splt_state *state, const char *message,
   {
     if (state->split.put_message != NULL)
     {
-      state->split.put_message(message, mess_type);
+      state->split.put_message(message, mess_type, state->split.put_message_cb_data);
     }
     else
     {

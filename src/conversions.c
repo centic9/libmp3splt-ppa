@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -80,7 +79,7 @@ long splt_co_convert_to_hundreths(const char *s)
 }
 
 //! Convert a factor to the corresponding dB value
-float splt_co_convert_to_dB(double input)
+float splt_co_convert_to_db(double input)
 {
   float level;
   if (input <= 0.0)
@@ -96,7 +95,7 @@ float splt_co_convert_to_dB(double input)
 }
 
 //! Convert a dB value to a factor
-double splt_co_convert_from_dB(float input)
+double splt_co_convert_from_db(float input)
 {
   double amp;
   if (input <- 96.0)

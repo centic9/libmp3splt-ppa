@@ -3,7 +3,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  *********************************************************/
 
@@ -20,8 +20,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *********************************************************/
 
@@ -126,7 +125,7 @@ static char *splt_io_readlink(const char *fname)
   return NULL;
 }
 
-char *splt_io_get_linked_fname(const char *fname, int *number_of_symlinks)
+static char *splt_io_get_linked_fname_one_level(const char *fname, int *number_of_symlinks)
 {
   char *previous_linked_fname = NULL;
 
@@ -206,6 +205,26 @@ char *splt_io_get_linked_fname(const char *fname, int *number_of_symlinks)
   linked_fname = NULL;
 
   return linked_fname_with_path;
+}
+
+char *splt_io_get_linked_fname(const char *fname, int *number_of_symlinks)
+{
+  int num_of_symlinks = 0;
+
+  char *output_fname = splt_io_get_linked_fname_one_level(fname, number_of_symlinks);
+  while (output_fname != NULL && splt_io_file_type_is(output_fname, S_IFLNK))
+  {
+    char *new_output_fname = splt_io_get_linked_fname_one_level(output_fname, &num_of_symlinks);
+    free(output_fname);
+    output_fname = new_output_fname;
+
+    if (num_of_symlinks == MAX_SYMLINKS)
+    {
+      break;
+    }
+  }
+
+  return output_fname;
 }
 
 static int splt_io_linked_file_type_is(const char *fname, int file_type)
@@ -689,11 +708,14 @@ end:
   }
 }
 
-size_t splt_io_fwrite(splt_state *state, const void *ptr,
-    size_t size, size_t nmemb, FILE *stream)
+size_t splt_io_fwrite(splt_state *state, const void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
   if (splt_o_get_int_option(state, SPLT_OPT_PRETEND_TO_SPLIT))
   {
+    if (state->split.write_cb != NULL)
+    {
+      state->split.write_cb(ptr, size, nmemb, state->split.write_cb_data);
+    }
     return size * nmemb;
   }
   else

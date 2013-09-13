@@ -1,11 +1,11 @@
 /**********************************************************
  *
  * audacity.c -- Audacity label file parser portion of the Mp3Splt utility
- *                    Utility for mp3/ogg splitting without decoding
+ *               Utility for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2004 M. Trotta - <matteo.trotta@lib.unimib.it>
  * Copyright (c) 2007 Federico Grau - <donfede@casagrau.org>
- * Copyright (c) 2010-2012 Alexandru Munteanu <io_fx@yahoo.fr>
+ * Copyright (c) 2005-2013 Alexandru Munteanu - <m@ioalex.net>
  *
  * http://mp3splt.sourceforge.net
  * http://audacity.sourceforge.net/
@@ -25,8 +25,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -44,7 +43,6 @@ Input splitpoints from audacity.
 #include <math.h>
 
 #include "splt.h"
-
 
 static long splt_audacity_get_begin(splt_audacity *sa)
 {
@@ -146,7 +144,6 @@ static int splt_audacity_set_name(splt_audacity *sa, const char *name)
 
 static long to_hundreths(char *str)
 {
-  long hun = 0;
   long seconds = 0, hundreths = 0;
   sscanf(str, "%ld.%4ld", &seconds, &hundreths);
 
@@ -221,6 +218,9 @@ error:
 
 int splt_audacity_put_splitpoints(const char *file, splt_state *state, int *error)
 {
+  char *line = NULL;
+  splt_audacity *previous_aud = NULL;
+
 	int tracks = -1;
 
   if (file == NULL)
@@ -256,10 +256,8 @@ int splt_audacity_put_splitpoints(const char *file, splt_state *state, int *erro
   int err = SPLT_OK;
 
   splt_audacity *aud = NULL;
-  splt_audacity *previous_aud = NULL;
 
   tracks = 0;
-  char *line = NULL;
   while ((line = splt_io_readline(file_input, error)) != NULL)
   {
     if (*error < 0) { goto end; }
@@ -271,8 +269,7 @@ int splt_audacity_put_splitpoints(const char *file, splt_state *state, int *erro
       continue;
     }
 
-    aud = splt_audacity_process_line(state, line, previous_aud,
-        &append_begin_point, &err);
+    aud = splt_audacity_process_line(state, line, previous_aud, &append_begin_point, &err);
     if (err < 0) { goto end; }
 
     if (previous_aud)

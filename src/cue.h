@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2012 Alexandru Munteanu - io_fx@yahoo.fr
+ * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -24,8 +24,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307,
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA.
  *
  *********************************************************/
@@ -38,24 +37,10 @@ typedef struct {
   int tracks;
   int time_for_track;
   int error;
-  int performer;
-  int title;
   /*! \brief cue input filename
-  */
+   */
   const char *file;
   int counter;
-  /*! \brief Do we have to build the file name from the tags?
-
-    - SPLT_FALSE means we build a filename from the tags 
-    - SPLT_TRUE means filename is track name
-  */
-  int title_is_filename;
-
-  /*! \brief Has this file been created by us?
-
-    If not we append a splitpoint at the end of the file.
-  */
-  int file_has_been_created_by_us;
 
   /*! \brief The type of the current track.
 
@@ -65,6 +50,9 @@ typedef struct {
 
    */
   int current_track_type;
+  char *current_name;
+
+  splt_tags *all_tags;
 } cue_utils;
 
 int splt_cue_put_splitpoints(const char *file, splt_state *state, int *error);
