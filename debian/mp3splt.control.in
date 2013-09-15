@@ -11,9 +11,9 @@ Vcs-Browser: ###LIBMP3SPLT_VCS_BROWSER###
 Package: ###PACKAGE_NAME###
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libmp3splt0-mp3 | libmp3splt0-plugin
-Recommends: libmp3splt0-mp3, libmp3splt0-ogg, ###RECOMMENDS###
+Recommends: libmp3splt0-mp3, libmp3splt0-ogg, libmp3splt0-flac, ###RECOMMENDS###
 Suggests: ###OTHER_PACKAGE###, ###SUGGESTS###
-Description: ###SHORT_INTERFACE### interface to split MP3 and Ogg Vorbis files without reencoding
+Description: ###SHORT_INTERFACE### interface to split MP3, Ogg Vorbis and flac files without reencoding
 ###DESCRIPTION###
  .
  This package provides ###PACKAGE_NAME###, the ###LONG_INTERFACE### interface.
