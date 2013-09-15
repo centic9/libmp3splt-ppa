@@ -16,9 +16,9 @@ Conflicts: libmp3splt, libmp3splt-mp3, libmp3splt-ogg
 Replaces: libmp3splt, libmp3splt-mp3, libmp3splt-ogg
 Depends: libmp3splt0 (= ${binary:Version}), ${misc:Depends}, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libflac-dev
 Description: development files for libmp3splt0
- Mp3Splt-project is a utility to split mp3 and ogg files selecting a
+ Mp3Splt-project is a utility to split mp3, ogg and flac files selecting a
  begin and an end time position, without decoding. It's very useful to
- split large mp3/ogg to make smaller files or to split entire albums to
+ split large mp3/ogg/flac to make smaller files or to split entire albums to
  obtain original tracks. If you want to split an album, you can select
  split points and filenames manually or you can get them automatically
  from CDDB (internet or a local file) or from .cue files. Supports also
@@ -38,9 +38,9 @@ Conflicts: libmp3splt, libmp3splt-ogg
 Replaces: libmp3splt, libmp3splt-ogg
 Provides: libmp3splt0-plugin
 Description: Ogg Vorbis plugin for mp3splt
- Mp3Splt-project is a utility to split mp3 and ogg files selecting a
+ Mp3Splt-project is a utility to split mp3, ogg and flac files selecting a
  begin and an end time position, without decoding. It's very useful to
- split large mp3/ogg to make smaller files or to split entire albums to
+ split large mp3/ogg/flac to make smaller files or to split entire albums to
  obtain original tracks. If you want to split an album, you can select
  split points and filenames manually or you can get them automatically
  from CDDB (internet or a local file) or from .cue files. Supports also
@@ -59,9 +59,9 @@ Conflicts: libmp3splt, libmp3splt-mp3
 Replaces: libmp3splt, libmp3splt-mp3
 Provides: libmp3splt0-plugin
 Description: MP3 plugin for mp3splt
- Mp3Splt-project is a utility to split mp3 and ogg files selecting a
+ Mp3Splt-project is a utility to split mp3, ogg and flac files selecting a
  begin and an end time position, without decoding. It's very useful to
- split large mp3/ogg to make smaller files or to split entire albums to
+ split large mp3/ogg/flac to make smaller files or to split entire albums to
  obtain original tracks. If you want to split an album, you can select
  split points and filenames manually or you can get them automatically
  from CDDB (internet or a local file) or from .cue files. Supports also
@@ -80,9 +80,9 @@ Conflicts: libmp3splt, libmp3splt-flac
 Replaces: libmp3splt, libmp3splt-flac
 Provides: libmp3splt0-plugin
 Description: FLAC plugin for mp3splt
- Mp3Splt-project is a utility to split mp3 and ogg files selecting a
+ Mp3Splt-project is a utility to split mp3, ogg and flac files selecting a
  begin and an end time position, without decoding. It's very useful to
- split large mp3/ogg to make smaller files or to split entire albums to
+ split large mp3/ogg/flac to make smaller files or to split entire albums to
  obtain original tracks. If you want to split an album, you can select
  split points and filenames manually or you can get them automatically
  from CDDB (internet or a local file) or from .cue files. Supports also
@@ -102,9 +102,9 @@ Conflicts: libmp3splt
 Breaks: mp3splt (= 2.4.2-1), mp3splt-gtk (= 0.7.2-1)
 Replaces: libmp3splt
 Description: library for splitting MP3, Ogg Vorbis and FLAC files
- Mp3Splt-project is a utility to split mp3 and ogg files selecting a
+ Mp3Splt-project is a utility to split mp3, ogg and flac files selecting a
  begin and an end time position, without decoding. It's very useful to
- split large mp3/ogg to make smaller files or to split entire albums to
+ split large mp3/ogg/flac to make smaller files or to split entire albums to
  obtain original tracks. If you want to split an album, you can select
  split points and filenames manually or you can get them automatically
  from CDDB (internet or a local file) or from .cue files. Supports also
