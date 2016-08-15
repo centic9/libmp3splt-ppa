@@ -1,7 +1,7 @@
 Source: libmp3splt
 Priority: optional
 Maintainer: Ryan Niebur <ryan@debian.org>
-Build-Depends: ###BUILDDEPS###, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libpcre3-dev
+Build-Depends: ###BUILDDEPS###, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libpcre3-dev, libflac-dev
 Standards-Version: 3.9.3
 Section: libs
 Homepage: http://mp3splt.sourceforge.net/
@@ -14,7 +14,7 @@ Section: libdevel
 Architecture: any
 Conflicts: libmp3splt, libmp3splt-mp3, libmp3splt-ogg
 Replaces: libmp3splt, libmp3splt-mp3, libmp3splt-ogg
-Depends: libmp3splt###SONAME### (= ${binary:Version}), ${misc:Depends}, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev
+Depends: libmp3splt###SONAME### (= ${binary:Version}), ${misc:Depends}, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libflac-dev
 Description: development files for libmp3splt###SONAME###
 ###DESCRIPTION###
  .
@@ -43,6 +43,17 @@ Description: MP3 plugin for mp3splt
  .
  This package contains the MP3 plugin.
 
+Package: libmp3splt###SONAME###-flac
+Architecture: any
+Depends: libmp3splt###SONAME### (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libmp3splt, libmp3splt-flac
+Replaces: libmp3splt, libmp3splt-flac
+Provides: libmp3splt###SONAME###-plugin
+Description: FLAC plugin for mp3splt
+###DESCRIPTION###
+ .
+ This package contains the FLAC plugin.
+
 Package: libmp3splt###SONAME###
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -50,7 +61,7 @@ Suggests: mp3splt, mp3splt-gtk
 Conflicts: libmp3splt
 Breaks: mp3splt (= 2.4.2-1), mp3splt-gtk (= 0.7.2-1)
 Replaces: libmp3splt
-Description: library for splitting MP3 and Ogg Vorbis files
+Description: library for splitting MP3, Ogg Vorbis and FLAC files
 ###DESCRIPTION###
  .
  This package contains the library needed to run programs that use

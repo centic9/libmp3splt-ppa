@@ -1,6 +1,7 @@
 usr/include/*
 usr/lib/lib*.a
-usr/lib/libmp3splt/lib*.a
+usr/lib/libmp3splt0/lib*.a
 usr/lib/lib*.so
 debian/mp3splt.rules usr/share/libmp3splt-dev/
-usr/lib/libmp3splt/lib*.so
+usr/lib/libmp3splt0/lib*.so
+usr/lib/pkgconfig/libmp3splt.pc
