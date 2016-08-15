@@ -1,7 +1,7 @@
 Source: libmp3splt
 Priority: optional
 Maintainer: Ryan Niebur <ryan@debian.org>
-Build-Depends: ###BUILDDEPS###, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libpcre3-dev, libflac-dev
+Build-Depends: ###BUILDDEPS###, gawk, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libpcre3-dev, libflac-dev, doxygen, graphviz
 Standards-Version: 3.9.3
 Section: libs
 Homepage: http://mp3splt.sourceforge.net/
@@ -14,7 +14,7 @@ Section: libdevel
 Architecture: any
 Conflicts: libmp3splt, libmp3splt-mp3, libmp3splt-ogg
 Replaces: libmp3splt, libmp3splt-mp3, libmp3splt-ogg
-Depends: libmp3splt###SONAME### (= ${binary:Version}), ${misc:Depends}, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libflac-dev
+Depends: libmp3splt###SONAME### (= ${binary:Version}), ${misc:Depends}, libogg-dev, libvorbis-dev, libmad0-dev, libltdl3-dev, libid3tag0-dev, libpcre3-dev, libflac-dev
 Description: development files for libmp3splt###SONAME###
 ###DESCRIPTION###
  .

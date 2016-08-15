@@ -1,3 +1,9 @@
+libmp3splt (0.9.2-0ubuntu0~ppa1) xenial; urgency=medium
+
+  * New upstream version
+
+ -- Dominik Stadler (Ubuntu key) <dominik.stadler@gmx.at>  Mon, 15 Aug 2016 10:04:04 +0200
+
 libmp3splt (0.9.2) trusty; urgency=low
 
   * New version
