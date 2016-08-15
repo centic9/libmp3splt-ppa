@@ -2,6 +2,37 @@ Known issues :
 
 - C library error messages not translated on windows : won't fix
 
+libmp3splt version 0.9.2
+-------------------------------------------------------------
+
+- added bit reservoir handling for gapless playback option
+- added @d to output format which is equal to: last directory of the input filename or the filename itself if no directory
+- fixed bug #170 - included stdlib.h in src/plugins.c for getenv() because otherwise segfault on RHEL 5.6 64bits
+
+libmp3splt version 0.9.1b
+-------------------------------------------------------------
+
+- bug fix: make sure to separate artist and performer in CUE files for use of @p and @a
+- bug fix on CUE: from INDEX format MM:SS:FF, handle FF as frames instead of hundreths
+- bug fix: issue when having input file inside several recursive symlinks
+- small improvement on CUE: also accept INDEX 1 and not only INDEX 01
+
+libmp3splt version 0.9.1a
+-------------------------------------------------------------
+
+- FLAC: fixed an important bug not allowing to split some files
+
+libmp3splt version 0.9.1
+-------------------------------------------------------------
+- FLAC internal cue sheets support
+- simple MP3 chapter marks support (with no overlap)
+- added #161 FLAC option to compute and write MD5 sum in the STREAMINFO metadata block
+- fixed bug #159 with some FLAC files being detected as MP3; also look for the file extension
+  when detecting a file for a plugin
+- fixed bug '#160 ---last cue splitpoint--- created at 99 59 99 for mp3 files >100mins' (libmp3splt)
+- fixed bug with FLAC & pretend to split option
+- patch #8 to fix Werror=format-security in snprintf
+
 libmp3splt version 0.9
 -------------------------------------------------------------
 - experimental FLAC support added - stdin and stdout are not yet implemented

@@ -4,7 +4,7 @@
 # *               for mp3/ogg splitting without decoding
 # *
 # * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
-# * Copyright (c) 2005-2013 Munteanu Alexandru - m@ioalex.net
+# * Copyright (c) 2005-2014 Munteanu Alexandru - m@ioalex.net
 # *
 # * http://mp3splt.sourceforge.net
 # *
@@ -36,7 +36,7 @@
 #inspired from gtk sources
 m4_define([libmp3splt_major_version], [0])
 m4_define([libmp3splt_minor_version], [9])
-m4_define([libmp3splt_micro_version], [0])
+m4_define([libmp3splt_micro_version], [2])
 m4_define([libmp3splt_version],
           [libmp3splt_major_version.libmp3splt_minor_version.libmp3splt_micro_version])
 

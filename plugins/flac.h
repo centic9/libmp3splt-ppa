@@ -2,7 +2,7 @@
  *
  * libmp3splt flac plugin 
  *
- * Copyright (c) 2013 Alexandru Munteanu - <m@ioalex.net>
+ * Copyright (c) 2014 Alexandru Munteanu - <m@ioalex.net>
  *
  * http://mp3splt.sourceforge.net
  *
@@ -34,6 +34,7 @@
 #include "flac_frame_reader.h"
 #include "flac_metadata.h"
 #include "flac_tags.h"
+#include "flac_md5_decoder.h"
 
 #define SPLT_FLAC_EXT ".flac"
 

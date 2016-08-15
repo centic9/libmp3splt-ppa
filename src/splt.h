@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -487,6 +487,10 @@ typedef struct {
   int cue_set_splitpoint_names_from_rem_name;
   int cue_disable_cue_file_created_message;
   int cue_cddb_add_tags_with_keep_original_tags;
+  int warn_if_no_auto_adjust_found;
+  int stop_if_no_auto_adjust_found;
+  int decode_and_write_flac_md5sum;
+  int handle_bit_reservoir;
   int id3v2_encoding;
   int input_tags_encoding;
   long time_minimum_length;
@@ -655,7 +659,11 @@ struct _splt_state {
 #include <locale.h>
 
 #ifdef ENABLE_NLS
-#  include <libintl.h>
+ #include <libintl.h>
+
+ #ifndef __WIN32
+  #include <langinfo.h>
+ #endif
 #endif
 
 #ifdef __WIN32__

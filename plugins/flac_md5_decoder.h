@@ -1,12 +1,10 @@
 /**********************************************************
  *
- * libmp3splt -- library based on mp3splt v2.1c,
+ * libmp3splt -- library based on mp3splt,
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
  * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
- *
- * And others ... see the AUTHORS file provided with libmp3splt source.
  *
  * http://mp3splt.sourceforge.net
  *
@@ -31,19 +29,31 @@
  *
  *********************************************************/
 
-#ifndef MP3SPLT_VERSION_H
+#ifndef MP3SPLT_FLAC_MD5_DECODER_H
 
-/**
- * @defgroup libmp3splt_version Versions
-@{
- */
+#include <FLAC/all.h>
 
-#define LIBMP3SPLT_MAJOR_VERSION 0
-#define LIBMP3SPLT_MINOR_VERSION 9
-#define LIBMP3SPLT_MICRO_VERSION 2
+#include <string.h>
 
-//@}
+#include "splt.h"
+#include "md5.h"
 
-#define MP3SPLT_VERSION_H
+typedef struct {
+  FLAC__StreamDecoder *decoder;
+  unsigned char *frame;
+  size_t frame_size;
+  size_t remaining_size;
+  splt_code error;
+  splt_state *state;
+  MD5_CTX md5_context;
+} splt_flac_md5_decoder;
+
+splt_flac_md5_decoder *splt_flac_md5_decoder_new_and_init(splt_state *state, splt_code *error);
+void splt_flac_md5_decode_frame(unsigned char *frame,
+    size_t frame_size, splt_flac_md5_decoder *flac_md5_d, splt_code *error, splt_state *state);
+unsigned char *splt_flac_md5_decoder_free_and_get_md5sum(splt_flac_md5_decoder *flac_md5_d);
+
+#define MP3SPLT_FLAC_MD5_DECODER_H
+
 #endif
 

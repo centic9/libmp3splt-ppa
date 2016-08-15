@@ -2,7 +2,7 @@
  *
  * libmp3splt flac plugin 
  *
- * Copyright (c) 2013 Alexandru Munteanu - <m@ioalex.net>
+ * Copyright (c) 2014 Alexandru Munteanu - <m@ioalex.net>
  *
  * http://mp3splt.sourceforge.net
  *
@@ -88,7 +88,7 @@ unsigned char splt_flac_u_read_bit(splt_flac_frame_reader *fr, splt_code *error)
 
   fr->remaining_bits--;
 
-  return (fr->last_byte & splt_flac_u_bit_access_table[fr->remaining_bits]) >> fr->remaining_bits;
+  return (fr->last_byte & splt_flac_u_bit_access_table[fr->remaining_bits + 1]) >> fr->remaining_bits;
 }
 
 static void splt_flac_u_append_input_buffer_to_output_buffer(splt_flac_frame_reader *fr,
