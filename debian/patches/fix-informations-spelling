@@ -4,18 +4,18 @@ Forwarded: no
 
 Index: libmp3splt/po/cs.po
 ===================================================================
---- libmp3splt.orig/po/cs.po	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/po/cs.po	2013-09-13 22:32:52.000000000 +0200
+--- libmp3splt.orig/po/cs.po	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/po/cs.po	2016-08-15 10:11:08.442742328 +0200
 @@ -36,7 +36,7 @@
  
- #: src/cue.c:513
+ #: src/cue.c:518
  #, c-format
 -msgid " reading informations from CUE file %s ...\n"
 +msgid " reading information from CUE file %s ...\n"
  msgstr " Čtou se informace ze souboru CUE %s …\n"
  
- #: src/cue.c:587 src/cddb.c:133
-@@ -467,7 +467,7 @@
+ #: src/cue.c:592 src/cddb.c:133
+@@ -521,7 +521,7 @@
  
  #: src/cddb.c:63
  #, c-format
@@ -23,8 +23,8 @@ Index: libmp3splt/po/cs.po
 +msgid " reading information from CDDB file %s ...\n"
  msgstr " Čtou se informace ze souboru CDDB %s …\n"
  
- #: src/string_utils.c:638 src/string_utils.c:659
-@@ -476,7 +476,7 @@
+ #: src/string_utils.c:659 src/string_utils.c:680
+@@ -530,7 +530,7 @@
  
  #: src/audacity.c:237
  #, c-format
@@ -35,18 +35,18 @@ Index: libmp3splt/po/cs.po
  #: src/filename_regex.c:90
 Index: libmp3splt/po/de_DE.po
 ===================================================================
---- libmp3splt.orig/po/de_DE.po	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/po/de_DE.po	2013-09-13 22:32:52.000000000 +0200
+--- libmp3splt.orig/po/de_DE.po	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/po/de_DE.po	2016-08-15 10:11:08.442742328 +0200
 @@ -34,7 +34,7 @@
  
- #: src/cue.c:513
+ #: src/cue.c:518
  #, c-format
 -msgid " reading informations from CUE file %s ...\n"
 +msgid " reading information from CUE file %s ...\n"
  msgstr " Informationen aus CUE-Datei %s werden gelesen …\n"
  
- #: src/cue.c:587 src/cddb.c:133
-@@ -456,7 +456,7 @@
+ #: src/cue.c:592 src/cddb.c:133
+@@ -509,7 +509,7 @@
  
  #: src/cddb.c:63
  #, c-format
@@ -54,8 +54,8 @@ Index: libmp3splt/po/de_DE.po
 +msgid " reading information from CDDB file %s ...\n"
  msgstr " Informationen aus CDDB-Datei %s werden gelesen …\n"
  
- #: src/string_utils.c:638 src/string_utils.c:659
-@@ -465,7 +465,7 @@
+ #: src/string_utils.c:659 src/string_utils.c:680
+@@ -518,7 +518,7 @@
  
  #: src/audacity.c:237
  #, c-format
@@ -66,18 +66,18 @@ Index: libmp3splt/po/de_DE.po
  #: src/filename_regex.c:90
 Index: libmp3splt/po/es.po
 ===================================================================
---- libmp3splt.orig/po/es.po	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/po/es.po	2013-09-13 22:32:52.000000000 +0200
+--- libmp3splt.orig/po/es.po	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/po/es.po	2016-08-15 10:11:08.446742409 +0200
 @@ -32,7 +32,7 @@
  
- #: src/cue.c:513
+ #: src/cue.c:518
  #, c-format
 -msgid " reading informations from CUE file %s ...\n"
 +msgid " reading information from CUE file %s ...\n"
  msgstr ""
  
- #: src/cue.c:587 src/cddb.c:133
-@@ -452,7 +452,7 @@
+ #: src/cue.c:592 src/cddb.c:133
+@@ -505,7 +505,7 @@
  
  #: src/cddb.c:63
  #, c-format
@@ -85,8 +85,8 @@ Index: libmp3splt/po/es.po
 +msgid " reading information from CDDB file %s ...\n"
  msgstr ""
  
- #: src/string_utils.c:638 src/string_utils.c:659
-@@ -461,7 +461,7 @@
+ #: src/string_utils.c:659 src/string_utils.c:680
+@@ -514,7 +514,7 @@
  
  #: src/audacity.c:237
  #, c-format
@@ -97,18 +97,18 @@ Index: libmp3splt/po/es.po
  #: src/filename_regex.c:90
 Index: libmp3splt/po/fr_FR.po
 ===================================================================
---- libmp3splt.orig/po/fr_FR.po	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/po/fr_FR.po	2013-09-13 22:32:52.000000000 +0200
+--- libmp3splt.orig/po/fr_FR.po	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/po/fr_FR.po	2016-08-15 10:11:08.446742409 +0200
 @@ -35,7 +35,7 @@
  
- #: src/cue.c:513
+ #: src/cue.c:518
  #, c-format
 -msgid " reading informations from CUE file %s ...\n"
 +msgid " reading information from CUE file %s ...\n"
  msgstr " lecture des informations du fichier CUE %s ...\n"
  
- #: src/cue.c:587 src/cddb.c:133
-@@ -464,7 +464,7 @@
+ #: src/cue.c:592 src/cddb.c:133
+@@ -518,7 +518,7 @@
  
  #: src/cddb.c:63
  #, c-format
@@ -116,8 +116,8 @@ Index: libmp3splt/po/fr_FR.po
 +msgid " reading information from CDDB file %s ...\n"
  msgstr " lecture des informations du fichier CDDB %s ...\n"
  
- #: src/string_utils.c:638 src/string_utils.c:659
-@@ -473,7 +473,7 @@
+ #: src/string_utils.c:659 src/string_utils.c:680
+@@ -527,7 +527,7 @@
  
  #: src/audacity.c:237
  #, c-format
@@ -128,18 +128,18 @@ Index: libmp3splt/po/fr_FR.po
  
 Index: libmp3splt/po/hr.po
 ===================================================================
---- libmp3splt.orig/po/hr.po	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/po/hr.po	2013-09-13 22:32:52.000000000 +0200
+--- libmp3splt.orig/po/hr.po	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/po/hr.po	2016-08-15 10:11:08.446742409 +0200
 @@ -35,7 +35,7 @@
  
- #: src/cue.c:513
+ #: src/cue.c:518
  #, c-format
 -msgid " reading informations from CUE file %s ...\n"
 +msgid " reading information from CUE file %s ...\n"
  msgstr ""
  
- #: src/cue.c:587 src/cddb.c:133
-@@ -457,7 +457,7 @@
+ #: src/cue.c:592 src/cddb.c:133
+@@ -510,7 +510,7 @@
  
  #: src/cddb.c:63
  #, c-format
@@ -147,8 +147,8 @@ Index: libmp3splt/po/hr.po
 +msgid " reading information from CDDB file %s ...\n"
  msgstr " čitanje informacija iz CDDB datoteke %s ...\n"
  
- #: src/string_utils.c:638 src/string_utils.c:659
-@@ -466,7 +466,7 @@
+ #: src/string_utils.c:659 src/string_utils.c:680
+@@ -519,7 +519,7 @@
  
  #: src/audacity.c:237
  #, c-format
@@ -159,8 +159,8 @@ Index: libmp3splt/po/hr.po
  #: src/filename_regex.c:90
 Index: libmp3splt/src/audacity.c
 ===================================================================
---- libmp3splt.orig/src/audacity.c	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/src/audacity.c	2013-09-13 22:32:52.000000000 +0200
+--- libmp3splt.orig/src/audacity.c	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/src/audacity.c	2016-08-15 10:11:08.446742409 +0200
 @@ -234,7 +234,7 @@
    *error = SPLT_AUDACITY_OK;
  
@@ -172,8 +172,8 @@ Index: libmp3splt/src/audacity.c
  
 Index: libmp3splt/src/cddb.c
 ===================================================================
---- libmp3splt.orig/src/cddb.c	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/src/cddb.c	2013-09-13 22:32:52.000000000 +0200
+--- libmp3splt.orig/src/cddb.c	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/src/cddb.c	2016-08-15 10:11:08.446742409 +0200
 @@ -60,7 +60,7 @@
    }
  
@@ -185,18 +185,18 @@ Index: libmp3splt/src/cddb.c
  
 Index: libmp3splt/po/libmp3splt0.pot
 ===================================================================
---- libmp3splt.orig/po/libmp3splt0.pot	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/po/libmp3splt0.pot	2013-09-13 22:32:52.000000000 +0200
+--- libmp3splt.orig/po/libmp3splt0.pot	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/po/libmp3splt0.pot	2016-08-15 10:11:08.446742409 +0200
 @@ -31,7 +31,7 @@
  
- #: src/cue.c:513
+ #: src/cue.c:518
  #, c-format
 -msgid " reading informations from CUE file %s ...\n"
 +msgid " reading information from CUE file %s ...\n"
  msgstr ""
  
- #: src/cue.c:587 src/cddb.c:133
-@@ -451,7 +451,7 @@
+ #: src/cue.c:592 src/cddb.c:133
+@@ -504,7 +504,7 @@
  
  #: src/cddb.c:63
  #, c-format
@@ -204,8 +204,8 @@ Index: libmp3splt/po/libmp3splt0.pot
 +msgid " reading information from CDDB file %s ...\n"
  msgstr ""
  
- #: src/string_utils.c:638 src/string_utils.c:659
-@@ -460,7 +460,7 @@
+ #: src/string_utils.c:659 src/string_utils.c:680
+@@ -513,7 +513,7 @@
  
  #: src/audacity.c:237
  #, c-format
@@ -216,9 +216,9 @@ Index: libmp3splt/po/libmp3splt0.pot
  #: src/filename_regex.c:90
 Index: libmp3splt/src/cue.c
 ===================================================================
---- libmp3splt.orig/src/cue.c	2013-09-13 22:31:54.000000000 +0200
-+++ libmp3splt/src/cue.c	2013-09-13 22:32:52.000000000 +0200
-@@ -510,7 +510,7 @@
+--- libmp3splt.orig/src/cue.c	2016-08-15 10:11:08.554744585 +0200
++++ libmp3splt/src/cue.c	2016-08-15 10:11:08.446742409 +0200
+@@ -515,7 +515,7 @@
    }
  
    splt_c_put_info_message_to_client(state, 
