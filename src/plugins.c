@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -38,6 +38,7 @@ Loading and unloading of plug-ins
 #include <errno.h>
 
 #include <ltdl.h>
+#include <stdlib.h>
 
 #ifdef __WIN32__
 #include <direct.h>
@@ -412,8 +413,6 @@ static void splt_p_free_plugin_data(splt_plugin_data *pl_data)
 int splt_p_move_replace_plugin_data(splt_state *state, int old, int new)
 {
   splt_plugins *pl = state->plug;
-  fprintf(stdout, "move old %d to new %d\n", old, new);
-  fflush(stdout);
 
   splt_p_free_plugin_data(&pl->data[new]);
 
@@ -620,6 +619,8 @@ int splt_p_find_get_plugins_data(splt_state *state)
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_check_plugin_is_for_file");
       pl->data[i].func->splt_pl_search_syncerrors =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_search_syncerrors");
+      pl->data[i].func->splt_pl_import_internal_sheets =
+        lt_dlsym(pl->data[i].plugin_handle, "splt_pl_import_internal_sheets");
       pl->data[i].func->splt_pl_dewrap =
         lt_dlsym(pl->data[i].plugin_handle, "splt_pl_dewrap");
       pl->data[i].func->splt_pl_offset_split =
@@ -797,6 +798,25 @@ void splt_p_dewrap(splt_state *state, int listonly, const char *dir, int *error)
       *error = SPLT_PLUGIN_ERROR_UNSUPPORTED_FEATURE;
     }
   }
+}
+
+void splt_p_import_internal_sheets(splt_state *state, splt_code *error)
+{
+  splt_plugins *pl = state->plug;
+  int current_plugin = splt_p_get_current_plugin(state);
+  if ((current_plugin < 0) || (current_plugin >= pl->number_of_plugins_found))
+  {
+    *error = SPLT_ERROR_NO_PLUGIN_FOUND;
+    return;
+  }
+
+  if (pl->data[current_plugin].func->splt_pl_import_internal_sheets == NULL)
+  {
+    *error = SPLT_PLUGIN_ERROR_UNSUPPORTED_FEATURE;
+    return;
+  }
+
+  pl->data[current_plugin].func->splt_pl_import_internal_sheets(state, error);
 }
 
 double splt_p_split(splt_state *state, const char *final_fname, double begin_point,

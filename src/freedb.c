@@ -3,7 +3,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  *********************************************************/
 
@@ -37,7 +37,7 @@ that is meant to be used directly are all in mp3splt.c.
 
 #ifdef __WIN32__
 #include <conio.h>
-#include <winsock.h>
+#include <winsock2.h>
 #else
 #include <netdb.h>
 #include <sys/socket.h>

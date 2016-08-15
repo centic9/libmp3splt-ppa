@@ -2,7 +2,7 @@
  *
  * libmp3splt flac plugin 
  *
- * Copyright (c) 2013 Alexandru Munteanu - <m@ioalex.net>
+ * Copyright (c) 2014 Alexandru Munteanu - <m@ioalex.net>
  *
  * http://mp3splt.sourceforge.net
  *
@@ -532,12 +532,16 @@ static void splt_flac_fr_write_frame_processor(unsigned char *frame, size_t fram
   modified_frame[j] = first_byte_of_new_crc16;
   modified_frame[j+1] = last_byte_of_new_crc16;
 
+  splt_flac_md5_decode_frame(modified_frame, modified_frame_length, fr->flac_md5_d, error, state);
+  if (*error < 0) { goto end; }
+
   if (splt_io_fwrite(state, modified_frame, modified_frame_length, 1, fr->out) != 1)
   {
     splt_e_set_error_data(state, fr->output_fname);
     *error = SPLT_ERROR_CANT_WRITE_TO_OUTPUT_FILE;
   }
 
+end:
   free(modified_frame);
 }
 
@@ -566,6 +570,18 @@ static void splt_flac_fr_finish_and_write_streaminfo(splt_state *state,
     fr->out_streaminfo.max_blocksize = max_blocksize;
   }
 
+  unsigned char *md5sum = splt_flac_md5_decoder_free_and_get_md5sum(fr->flac_md5_d);
+  fr->flac_md5_d = NULL;
+  if (md5sum)
+  {
+    int i;
+    for (i = 0; i < 16; i++)
+    {
+      fr->out_streaminfo.md5sum[i] = md5sum[i];
+    }
+    free(md5sum);
+  }
+
   unsigned char *streaminfo_bytes = splt_flac_l_convert_from_streaminfo(&fr->out_streaminfo);
   if (streaminfo_bytes == NULL)
   {
@@ -586,7 +602,10 @@ static void splt_flac_fr_finish_and_write_streaminfo(splt_state *state,
   }
 
   //TODO: remove fseek for stdout; how to ?
-  rewind(fr->out);
+  if (fr->out != NULL)
+  {
+    rewind(fr->out);
+  }
 
   unsigned char flac_word[4] = { 0x66, 0x4C, 0x61, 0x43 };
   if (splt_io_fwrite(state, flac_word, 4, 1, fr->out) != 1)
@@ -708,6 +727,11 @@ void splt_flac_fr_free(splt_flac_frame_reader *fr)
   if (fr->output_buffer) { free(fr->output_buffer); }
   if (fr->previous_frame) { free(fr->previous_frame); }
   if (fr->output_fname) { free(fr->output_fname); }
+  if (fr->flac_md5_d)
+  {
+    unsigned char *md5sum = splt_flac_md5_decoder_free_and_get_md5sum(fr->flac_md5_d);
+    if (md5sum) { free(md5sum); }
+  }
 
   free(fr);
 }
@@ -837,12 +861,15 @@ static void splt_flac_fr_open_file_and_write_metadata_if_first_time(splt_flac_fr
 
   splt_c_put_progress_text(state, SPLT_PROGRESS_CREATE);
 
-  fr->out = splt_io_fopen(output_fname, "wb+");
-  if (fr->out == NULL)
+  if (! splt_o_get_int_option(state, SPLT_OPT_PRETEND_TO_SPLIT))
   {
-    splt_e_set_strerror_msg_with_data(state, output_fname);
-    *error = SPLT_ERROR_CANNOT_OPEN_DEST_FILE;
-    return;
+    fr->out = splt_io_fopen(output_fname, "wb+");
+    if (fr->out == NULL)
+    {
+      splt_e_set_strerror_msg_with_data(state, output_fname);
+      *error = SPLT_ERROR_CANNOT_OPEN_DEST_FILE;
+      return;
+    }
   }
 
   unsigned char space[4+SPLT_FLAC_METADATA_HEADER_LENGTH+SPLT_FLAC_STREAMINFO_LENGTH] = {'\0'};
@@ -1032,6 +1059,9 @@ void splt_flac_fr_read_and_write_frames(splt_state *state, splt_flac_frame_reade
         else
         {
           end_point += (double) adjust_gap_secs;
+
+          *error = splt_u_process_no_auto_adjust_found(state, end_point);
+          if (*error < 0) { goto end; }
         }
 
         splt_siu_ssplit_free(&state->silence_list);

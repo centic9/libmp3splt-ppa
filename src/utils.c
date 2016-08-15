@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -114,5 +114,25 @@ short splt_u_fend_sec_is_bigger_than_total_time(splt_state *state, double fend_s
   }
 
   return SPLT_FALSE;*/
+}
+
+splt_code splt_u_process_no_auto_adjust_found(splt_state *state, double point)
+{
+  if (splt_o_get_int_option(state, SPLT_OPT_WARN_IF_NO_AUTO_ADJUST_FOUND))
+  {
+    long time = splt_co_time_to_long(point);
+    long mins, secs, hundr;
+    splt_co_get_mins_secs_hundr(time, &mins, &secs, &hundr);
+    splt_c_put_warning_message_to_client(state,
+        _(" warning: splitpoint %ld.%ld.%ld is not auto-adjusted\n"), 
+        mins, secs, hundr);
+  }
+
+  if (splt_o_get_int_option(state, SPLT_OPT_STOP_IF_NO_AUTO_ADJUST_FOUND))
+  {
+    return SPLT_ERROR_NO_AUTO_ADJUST_FOUND;
+  }
+
+  return SPLT_OK;
 }
 

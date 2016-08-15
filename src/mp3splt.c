@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -127,10 +127,12 @@ splt_state *mp3splt_new_state(splt_code *error)
   {
 
 #ifdef ENABLE_NLS
-# ifndef __WIN32__
+ #ifndef __WIN32__
     bindtextdomain(MP3SPLT_LIB_GETTEXT_DOMAIN, LOCALEDIR);
-# endif
+    bind_textdomain_codeset(MP3SPLT_LIB_GETTEXT_DOMAIN, nl_langinfo(CODESET));
+ #else
     bind_textdomain_codeset(MP3SPLT_LIB_GETTEXT_DOMAIN, "UTF-8");
+ #endif
 #endif
 
     state = splt_t_new_state(state, err);
@@ -898,7 +900,7 @@ splt_code mp3splt_read_original_tags(splt_state *state)
 
   splt_o_lock_library(state);
 
-  splt_check_file_type(state, &error);
+  splt_check_file_type_and_set_plugin(state, SPLT_FALSE, SPLT_FALSE, &error);
   if (error < 0) { goto end; }
 
   splt_o_lock_messages(state);
@@ -1086,6 +1088,57 @@ splt_code mp3splt_split(splt_state *state)
 
       splt_d_print_debug(state,"Starting to split file ...\n");
 
+      if (splt_o_get_int_option(state, SPLT_OPT_HANDLE_BIT_RESERVOIR))
+      {
+        splt_c_put_warning_message_to_client(state,
+            _(" warning: bit reservoir handling for gapless playback is still experimental\n"));
+
+        if (splt_o_get_long_option(state, SPLT_OPT_OVERLAP_TIME) > 0)
+        {
+          splt_c_put_warning_message_to_client(state, 
+              _(" warning: bit reservoir is not compatible with overlap option\n"));
+        }
+
+        if (splt_o_get_int_option(state, SPLT_OPT_AUTO_ADJUST))
+        {
+          splt_c_put_warning_message_to_client(state, 
+              _(" warning: bit reservoir is not compatible with auto adjust option\n"));
+        }
+
+        if (splt_o_get_int_option(state, SPLT_OPT_INPUT_NOT_SEEKABLE))
+        {
+          splt_c_put_warning_message_to_client(state, 
+              _(" warning: bit reservoir is not compatible with input not seekable\n"));
+        }
+
+        int supported_split_mode = SPLT_TRUE;
+        int split_mode = splt_o_get_int_option(state, SPLT_OPT_SPLIT_MODE);
+        if ((split_mode == SPLT_OPTION_SILENCE_MODE) || (split_mode == SPLT_OPTION_TRIM_SILENCE_MODE))
+        {
+          supported_split_mode = SPLT_FALSE;
+        }
+
+        if (!supported_split_mode)
+        {
+          splt_c_put_warning_message_to_client(state, 
+              _(" warning: bit reservoir is not compatible with silence detection or trimming\n"));
+        }
+
+        int with_xing = splt_o_get_int_option(state, SPLT_OPT_XING);
+        if (!with_xing)
+        {
+          splt_c_put_warning_message_to_client(state, 
+              _(" warning: bit reservoir is not compatible with 'no xing'\n"));
+        }
+
+        int with_frame_mode = splt_o_get_int_option(state, SPLT_OPT_FRAME_MODE);
+        if (!with_frame_mode)
+        {
+          splt_c_put_warning_message_to_client(state, 
+              _(" warning: please enable frame mode to make bit reservoir work\n"));
+        }
+      }
+
       char *new_filename_path = NULL;
       char *fname_to_split = splt_t_get_filename_to_split(state);
 
@@ -1170,7 +1223,7 @@ splt_code mp3splt_split(splt_state *state)
       if (error < 0) { goto function_end; }
 
       //we check if mp3 or ogg
-      splt_check_file_type(state, &error);
+      splt_check_file_type_and_set_plugin(state, SPLT_FALSE, SPLT_TRUE, &error);
       if (error < 0) { goto function_end; }
 
       int tags_option = splt_o_get_int_option(state, SPLT_OPT_TAGS);
@@ -1344,7 +1397,32 @@ splt_code mp3splt_import(splt_state *state, splt_import_type type, const char *f
   {
     splt_audacity_put_splitpoints(file, state, &err);
   }
+  else if (type == PLUGIN_INTERNAL_IMPORT)
+  {
+    char *old_filename_to_split = strdup(mp3splt_get_filename_to_split(state));
+    if (old_filename_to_split == NULL)
+    {
+      err = SPLT_ERROR_CANNOT_ALLOCATE_MEMORY;
+      goto end;
+    }
 
+    err = splt_t_set_filename_to_split(state, file);
+    if (err < 0) { goto end2; }
+
+    splt_check_file_type_and_set_plugin(state, SPLT_TRUE, SPLT_FALSE, &err);
+    if (err >= 0)
+    {
+      splt_t_free_splitpoints_tags(state);
+      splt_p_import_internal_sheets(state, &err);
+    }
+
+    splt_t_set_filename_to_split(state, old_filename_to_split);
+
+end2:
+    free(old_filename_to_split);
+  }
+
+end:
   splt_o_unlock_library(state);
 
   return err;
@@ -1636,7 +1714,7 @@ splt_wrap *mp3splt_get_wrap_files(splt_state *state, splt_code *error)
       splt_o_lock_library(state);
 
       //we check the format of the filename
-      splt_check_file_type(state, err);
+      splt_check_file_type_and_set_plugin(state, SPLT_FALSE, SPLT_FALSE, err);
 
       int old_split_mode = splt_o_get_int_option(state, SPLT_OPT_SPLIT_MODE);
       splt_o_set_int_option(state, SPLT_OPT_SPLIT_MODE, SPLT_OPTION_WRAP_MODE);
@@ -1734,7 +1812,7 @@ int mp3splt_set_silence_points(splt_state *state, splt_code *error)
 
       splt_t_set_stop_split(state, SPLT_FALSE);
 
-      splt_check_file_type(state, err);
+      splt_check_file_type_and_set_plugin(state, SPLT_FALSE, SPLT_FALSE, err);
 
       if (*err >= 0)
       {
@@ -1778,7 +1856,7 @@ splt_code mp3splt_set_trim_silence_points(splt_state *state)
 
       splt_t_set_stop_split(state, SPLT_FALSE);
 
-      splt_check_file_type(state, err);
+      splt_check_file_type_and_set_plugin(state, SPLT_FALSE, SPLT_FALSE, err);
 
       if (*err >= 0)
       {
@@ -1851,18 +1929,6 @@ char *mp3splt_win32_utf16_to_utf8(const wchar_t *source)
 }
 #endif
 
-/*! TODO: What does this function do
-
-\param state The splt_state The central structure containing all data
-for our library
-\param num_of_files_found The number of files this library has found
-\param error The error code
-
-\attention The resulting string is malloc'ed and must be freed by the
-caller after use.
-
-\todo What does this function do?
-*/
 char **mp3splt_find_filenames(splt_state *state, const char *filename,
     int *num_of_files_found, splt_code *error)
 {
@@ -1973,7 +2039,7 @@ splt_tags *mp3splt_parse_filename_regex(splt_state *state, splt_code *error)
 #ifndef NO_PCRE
       tags = splt_fr_parse_from_state(state, error);
 #else
-      splt_c_put_info_message_to_client(state,
+      splt_c_put_warning_message_to_client(state,
           _(" warning: cannot set tags from filename regular expression - compiled without pcre support\n"));
       *error = SPLT_REGEX_UNAVAILABLE;
 #endif

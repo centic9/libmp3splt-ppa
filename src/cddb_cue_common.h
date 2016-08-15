@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -32,7 +32,8 @@
 #ifndef CDDB_CUE_COMMON_H
 
 void splt_cc_put_filenames_from_tags(splt_state *state, int tracks, int *error,
-    const splt_tags *all_tags, int only_set_name_if_null);
+    const splt_tags *all_tags, int only_set_name_if_null,
+    int force_splitnumber_as_filenumber);
 
 #define CDDB_CUE_COMMON_H
 

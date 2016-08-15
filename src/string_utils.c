@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -455,6 +455,27 @@ char *splt_su_get_fname_without_path_and_extension(const char *filename, int *er
   splt_su_cut_extension(fname_without_path_and_extension);
 
   return fname_without_path_and_extension;
+}
+
+char *splt_su_get_last_dir_of_fname(const char *filename_with_path, int *error)
+{
+  if (!filename_with_path) { return NULL; }
+
+  char *full_fname = strdup(filename_with_path);
+  if (!full_fname) { *error = SPLT_ERROR_CANNOT_ALLOCATE_MEMORY; return NULL; }
+
+  splt_su_keep_path_and_remove_filename(full_fname);
+
+  char *first_dirchar = strchr(full_fname, SPLT_DIRCHAR);
+  if (!first_dirchar) { return full_fname; }
+
+  char *last_dir = NULL;
+  int err = splt_su_copy(first_dirchar + 1, &last_dir);
+  if (err < 0) { *error = err; }
+
+  free(full_fname);
+
+  return last_dir;
 }
 
 char *splt_su_get_fname_with_path_and_extension(splt_state *state, int *error)

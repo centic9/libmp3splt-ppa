@@ -3,7 +3,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  *********************************************************/
 
@@ -93,7 +93,20 @@ static int splt_io_file_type_is(const char *fname, int file_type)
 }
 
 #ifndef __WIN32__
-static char *splt_io_readlink(const char *fname)
+static char *splt_io_to_real_path(char *fname)
+{
+  char *resolved_path = realpath(fname, NULL);
+
+  if (resolved_path)
+  {
+    free(fname);
+    return resolved_path;
+  }
+
+  return fname;
+}
+
+static char *splt_io_readlink_as_realpath(const char *fname)
 {
   int bufsize = 1024;
 
@@ -115,7 +128,7 @@ static char *splt_io_readlink(const char *fname)
     if (real_link_size < bufsize)
     {
       linked_fname[real_link_size] = '\0';
-      return linked_fname;
+      return splt_io_to_real_path(linked_fname);
     }
 
     free(linked_fname);
@@ -129,7 +142,7 @@ static char *splt_io_get_linked_fname_one_level(const char *fname, int *number_o
 {
   char *previous_linked_fname = NULL;
 
-  char *linked_fname = splt_io_readlink(fname);
+  char *linked_fname = splt_io_readlink_as_realpath(fname);
   if (!linked_fname)
   {
     return NULL;
@@ -143,7 +156,7 @@ static char *splt_io_get_linked_fname_one_level(const char *fname, int *number_o
       free(previous_linked_fname);
     }
     previous_linked_fname = linked_fname;
-    linked_fname = splt_io_readlink(linked_fname);
+    linked_fname = splt_io_readlink_as_realpath(linked_fname);
 
     count++;
     if (count > MAX_SYMLINKS)
@@ -716,7 +729,7 @@ size_t splt_io_fwrite(splt_state *state, const void *ptr, size_t size, size_t nm
     {
       state->split.write_cb(ptr, size, nmemb, state->split.write_cb_data);
     }
-    return size * nmemb;
+    return nmemb;
   }
   else
   {
@@ -762,7 +775,7 @@ char *splt_io_readline(FILE *stream, int *error)
   return line;
 }
 
-unsigned char *splt_io_fread(FILE *file, int start, size_t size)
+unsigned char *splt_io_fread(FILE *file, size_t size)
 {
   unsigned char *bytes = malloc(sizeof(unsigned char) * size);
 

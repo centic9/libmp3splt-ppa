@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -56,7 +56,8 @@ void splt_check_set_correct_options(splt_state *state);
 /****************************/
 /* file checks */
 
-void splt_check_file_type(splt_state *state, int *error);
+void splt_check_file_type_and_set_plugin(splt_state *state, short force_check_by_extension, 
+    short show_warnings, int *error);
 int splt_check_is_the_same_file(splt_state *state, const char *file1,
     const char *file2, int *error);
 

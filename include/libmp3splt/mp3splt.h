@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * And others ... see the AUTHORS file provided with libmp3splt source.
  *
@@ -46,8 +46,9 @@ Source code and binaries can be found on the <a
 href="http://mp3splt.sourceforge.net/mp3splt_page/home.php">mp3splt-project home page</a>.\n
 
 Some of the library features include:
- - losslessly split of mp3 (using <a href="http://www.underbit.com/products/mad/">libmad</a>) and
-   ogg vorbis (using <a href="http://xiph.org/vorbis/">libvorbis</a>) files
+ - losslessly split of mp3 (using <a href="http://www.underbit.com/products/mad/">libmad</a>),
+   ogg vorbis (using <a href="http://xiph.org/vorbis/">libvorbis</a>),
+   <a href="https://xiph.org/flac/">FLAC</a> files
  - extensibility to other audio formats using plugins
  - querying tags from <a href="http://tracktype.org">tracktype.org</a>
  - split on silences
@@ -167,6 +168,7 @@ typedef enum {
   SPLT_ERROR_LENGTH_SPLIT_VALUE_INVALID = -35,
   SPLT_ERROR_CANNOT_GET_TOTAL_TIME = -36,
   SPLT_ERROR_LIBID3 = -37,
+  SPLT_ERROR_FAILED_BITRESERVOIR = -38,
 
   SPLT_FREEDB_ERROR_INITIALISE_SOCKET = -101,
   SPLT_FREEDB_ERROR_CANNOT_GET_HOST = -102,
@@ -186,6 +188,8 @@ typedef enum {
   SPLT_FREEDB_ERROR_SITE = -119,
   SPLT_FREEDB_ERROR_CANNOT_DISCONNECT = -120,
   SPLT_FREEDB_ERROR_PROXY_NOT_SUPPORTED = -121,
+  SPLT_ERROR_INTERNAL_SHEET = -122,
+  SPLT_ERROR_INTERNAL_SHEET_TYPE_NOT_SUPPORTED = -123,
 
   SPLT_DEWRAP_ERR_FILE_LENGTH = -200,
   SPLT_DEWRAP_ERR_VERSION_OLD = -201,
@@ -204,6 +208,10 @@ typedef enum {
   SPLT_INVALID_REGEX = -800,
   SPLT_REGEX_NO_MATCH = -801,
   SPLT_REGEX_UNAVAILABLE = -802,
+
+  SPLT_ERROR_NO_AUTO_ADJUST_FOUND = -900,
+
+  SPLT_ERROR_INVALID_CODE = -1000,
 } splt_code;
 
 //@}
@@ -671,6 +679,43 @@ typedef enum {
    * Default is 0.
    */
   SPLT_OPT_TIME_MINIMUM_THEORETICAL_LENGTH,
+  /**
+   * If #SPLT_TRUE, raise a warning when no auto-adjust silence is found when
+   * using the #SPLT_OPT_AUTO_ADJUST option.
+   *
+   * Int option that can take the values #SPLT_TRUE or #SPLT_FALSE.
+   *
+   * Default is #SPLT_FALSE.
+   */
+  SPLT_OPT_WARN_IF_NO_AUTO_ADJUST_FOUND,
+  /**
+   * If #SPLT_TRUE, stop with error when no auto-adjust silence is found when
+   * using the #SPLT_OPT_AUTO_ADJUST option.
+   *
+   * Int option that can take the values #SPLT_TRUE or #SPLT_FALSE.
+   *
+   * Default is #SPLT_FALSE.
+   */
+  SPLT_OPT_STOP_IF_NO_AUTO_ADJUST_FOUND,
+  /**
+   * If #SPLT_TRUE, decode flac frames before writing them in the output file and compute the md5sum
+   * to be stored in the FLAC header - this option decreases the performance of the split because of
+   * the decoding process - it might be twice slower.
+   *
+   * Int option that can take the values #SPLT_TRUE or #SPLT_FALSE.
+   *
+   * Default is #SPLT_FALSE.
+   */
+  SPLT_OPT_DECODE_AND_WRITE_FLAC_MD5SUM_FOR_CREATED_FILES,
+  /**
+   * If #SPLT_TRUE, handles bit-reservoir for gapless playback when splitting.
+   * It currently works only for mp3 files.
+   *
+   * Int option that can take the values #SPLT_TRUE or #SPLT_FALSE.
+   *
+   * Default is #SPLT_FALSE.
+   */
+  SPLT_OPT_HANDLE_BIT_RESERVOIR,
 } splt_options;
 
 /**
@@ -1072,6 +1117,10 @@ typedef enum {
    * @brief Info message
    */
   SPLT_MESSAGE_INFO,
+  /**
+   * @brief Warning message
+   */
+  SPLT_MESSAGE_WARNING,
   /**
    * @brief Debug message
    */
@@ -1728,7 +1777,8 @@ char **mp3splt_find_filenames(splt_state *state, const char *filename,
 typedef enum {
   CUE_IMPORT,
   CDDB_IMPORT,
-  AUDACITY_LABELS_IMPORT
+  AUDACITY_LABELS_IMPORT,
+  PLUGIN_INTERNAL_IMPORT
 } splt_import_type;
 
 /**
@@ -2109,16 +2159,17 @@ typedef struct _splt_original_tags splt_original_tags;
 /**
  * @brief Libmp3splt plugin API.
  *
- * \warning Because only mp3 and ogg plugins exist and are integrated with the library, the plugin
- * API might change.
+ * \warning The plugin API might still change.
  *
  * In order to create a plugin for libmp3splt, the following functions can be implemented.\n
  * Mandatory functions are #splt_pl_init, #splt_pl_end, #splt_pl_check_plugin_is_for_file,
  * #splt_pl_set_plugin_info and #splt_pl_split.
  *
- * Two examples can be found for the <a
- * href="http://svn.code.sf.net/p/mp3splt/code/mp3splt-project/trunk/libmp3splt/plugins/mp3.c">mp3</a> and
- * <a href="http://svn.code.sf.net/p/mp3splt/code/mp3splt-project/trunk/libmp3splt/plugins/ogg.c">ogg</a> implementations.
+ * Examples can be found for the <a
+ * href="http://svn.code.sf.net/p/mp3splt/code/mp3splt-project/trunk/libmp3splt/plugins/mp3.c">mp3</a>,
+ * <a href="http://svn.code.sf.net/p/mp3splt/code/mp3splt-project/trunk/libmp3splt/plugins/ogg.c">ogg vorbis</a>
+ * <a href="http://svn.code.sf.net/p/mp3splt/code/mp3splt-project/trunk/libmp3splt/plugins/flac.c">FLAC</a>
+ * implementations.
  */
 typedef struct {
   /**
@@ -2252,6 +2303,13 @@ typedef struct {
    * @param[out] error Fill in possible error.
    */
   void (*splt_pl_dewrap)(splt_state *state, int listonly, const char *dir, splt_code *error);
+  /**
+   * @brief Import splitpoints from internal sheets.
+   *
+   * @param[in] state Main state.
+   * @param[out] error Fill in possible error.
+   */
+  void (*splt_pl_import_internal_sheets)(splt_state *state, splt_code *error);
 } splt_plugin_func;
 
 //@}

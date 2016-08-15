@@ -4,7 +4,7 @@
  *                    Utility for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2004 M. Trotta - <matteo.trotta@lib.unimib.it>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  */
@@ -37,9 +37,9 @@ Manages a socket connection
 
 #ifdef __WIN32__
 #define _WIN32_WINNT 0x0501
+#include <ws2tcpip.h>
 #include <windows.h>
 #include <winsock2.h>
-#include <ws2tcpip.h>
 #else
 #include <netdb.h>
 #include <sys/socket.h>

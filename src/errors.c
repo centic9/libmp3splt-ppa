@@ -4,7 +4,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  * http://mp3splt.sourceforge.net
  *
@@ -39,7 +39,7 @@ that is meant to be used directly are all in mp3splt.c.
 #include <errno.h>
 
 #ifdef __WIN32__
-#include <winsock.h>
+#include <winsock2.h>
 #else
 #include <netdb.h>
 #endif
@@ -256,6 +256,13 @@ char *splt_e_strerror(splt_state *state, splt_code error_code)
     case SPLT_FREEDB_ERROR_SITE:
       return splt_su_get_formatted_message(state,
           _(" freedb error: bad response from remote host"));
+    case SPLT_ERROR_INTERNAL_SHEET:
+      return splt_su_get_formatted_message(state,
+          _(" internal sheet error: no internal sheet or invalid sheet"));
+    case SPLT_ERROR_INTERNAL_SHEET_TYPE_NOT_SUPPORTED:
+      return splt_su_get_formatted_message(state,
+          _(" internal sheet error: internal sheet type not supported"));
+
       //
     case SPLT_DEWRAP_OK:
       return splt_su_get_formatted_message(state, _(" wrap split ok"));
@@ -327,6 +334,9 @@ char *splt_e_strerror(splt_state *state, splt_code error_code)
     case SPLT_ERROR_LIBID3:
       return splt_su_get_formatted_message(state,
           _(" error: unknown error while setting tags with libid3"));
+    case SPLT_ERROR_FAILED_BITRESERVOIR:
+      return splt_su_get_formatted_message(state,
+          " error: bit reservoir failed - %s", state->err.error_data);
     case SPLT_ERROR_SPLITPOINTS_NOT_IN_ORDER:
       return splt_su_get_formatted_message(state,
           _(" error: the splitpoints are not in order (%s)"),
@@ -437,6 +447,11 @@ char *splt_e_strerror(splt_state *state, splt_code error_code)
       return splt_su_get_formatted_message(state, _(" regular expression error: no match"));
     case SPLT_REGEX_OK:
       return splt_su_get_formatted_message(state, _(" regular expression ok"));
+    case SPLT_ERROR_NO_AUTO_ADJUST_FOUND:
+      return splt_su_get_formatted_message(state, _(" error: one of the splitpoints has not been auto-adjusted"));
+    case SPLT_ERROR_INVALID_CODE:
+      return splt_su_get_formatted_message(state, _(" invalid code error: '%s'"),
+          state->err.error_data);
   }
 
   return NULL;

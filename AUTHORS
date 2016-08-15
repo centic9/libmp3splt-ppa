@@ -17,6 +17,9 @@ People who contributed to mp3splt-project development :
 
   and others ...
 
+Thanks to Sebastian Gesemann for writing pcutmp3.
+Bit reservoir handling in mp3splt is heavily inspired from pcutmp3.
+
 Homepage :
 	http://mp3splt.sourceforge.net/
 

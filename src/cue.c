@@ -3,7 +3,7 @@
  *               for mp3/ogg splitting without decoding
  *
  * Copyright (c) 2002-2005 M. Trotta - <mtrotta@users.sourceforge.net>
- * Copyright (c) 2005-2013 Alexandru Munteanu - m@ioalex.net
+ * Copyright (c) 2005-2014 Alexandru Munteanu - m@ioalex.net
  *
  *********************************************************/
 
@@ -216,11 +216,11 @@ static void splt_cue_process_performer_line(char *line_content, cue_utils *cu, s
   {
     if (cu->tracks > 0)
     {
-      if ((err = splt_cue_store_value(state, line_content, cu->tracks - 1, SPLT_TAGS_ARTIST, cu)) != SPLT_OK)
+      /*if ((err = splt_cue_store_value(state, line_content, cu->tracks - 1, SPLT_TAGS_ARTIST, cu)) != SPLT_OK)
       {
         cu->error = err;
         return;
-      }
+      }*/
 
       if ((err = splt_cue_store_value(state, line_content, cu->tracks - 1, SPLT_TAGS_PERFORMER, cu)) != SPLT_OK)
       {
@@ -232,11 +232,11 @@ static void splt_cue_process_performer_line(char *line_content, cue_utils *cu, s
 }
 
 //! Process the rest of a cue line that begins with the word INDEX
-static void splt_cue_process_index_line(char *line_content, cue_utils *cu, splt_state *state)
+static void splt_cue_process_index_line(int index_length, char *line_content, cue_utils *cu, splt_state *state)
 {
   int err = SPLT_OK;
 
-  line_content += 9;
+  line_content += index_length;
 
   if (cu->tracks <= 0)
   {
@@ -245,7 +245,7 @@ static void splt_cue_process_index_line(char *line_content, cue_utils *cu, splt_
 
   char *trimmed_line = splt_su_trim_spaces(line_content);
 
-  long hundr_seconds = splt_co_convert_to_hundreths(trimmed_line);
+  long hundr_seconds = splt_co_convert_cue_line_to_hundreths(trimmed_line);
   if (hundr_seconds == -1)
   {
     splt_e_set_error_data(state, cu->file);
@@ -429,7 +429,12 @@ static void splt_cue_process_line(char **l, cue_utils *cu, splt_state *state)
   }
   else if ((line_content = strstr(line, "INDEX 01")) != NULL)
   {
-    splt_cue_process_index_line(line_content, cu, state);
+    splt_cue_process_index_line(9, line_content, cu, state);
+  }
+  //also support strange CUE files having INDEX 1
+  else if ((line_content = strstr(line, "INDEX 1 ")) != NULL)
+  {
+    splt_cue_process_index_line(8, line_content, cu, state);
   }
   else if ((line_content = strstr(line, "FILE")) != NULL)
   {
@@ -563,7 +568,7 @@ int splt_cue_put_splitpoints(const char *file, splt_state *state, int *error)
 
   if (!splt_o_get_int_option(state, SPLT_OPT_CUE_SET_SPLITPOINT_NAMES_FROM_REM_NAME))
   {
-    splt_cc_put_filenames_from_tags(state, tracks, error, cu->all_tags, SPLT_TRUE);
+    splt_cc_put_filenames_from_tags(state, tracks, error, cu->all_tags, SPLT_TRUE, SPLT_FALSE);
   }
 
 function_end:
@@ -785,13 +790,13 @@ void splt_cue_export_to_file(splt_state *state, const char *out_file,
       fprintf(file_output, "    REM NOKEEP\n");
     }
 
-    long mins = 0, secs = 0, hundr = 0;
+    long mins = 0, secs = 0, frames = 0;
     if (splitpoint == LONG_MAX)
     {
       splitpoint = total_time;
     }
-    splt_sp_get_mins_secs_hundr_from_splitpoint(splitpoint, &mins, &secs, &hundr);
-    fprintf(file_output, "    INDEX 01 %02ld:%02ld:%02ld\n", mins, secs, hundr);
+    splt_sp_get_mins_secs_frames_from_splitpoint(splitpoint, &mins, &secs, &frames);
+    fprintf(file_output, "    INDEX 01 %02ld:%02ld:%02ld\n", mins, secs, frames);
 
     splt_t_set_current_split_file_number_next(state);
   }

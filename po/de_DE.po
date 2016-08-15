@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mp3splt-gtk\n"
 "Report-Msgid-Bugs-To: m@ioalex.net\n"
-"POT-Creation-Date: 2013-07-20 08:58+0200\n"
+"POT-Creation-Date: 2014-11-09 16:04+0100\n"
 "PO-Revision-Date: 2013-04-29 08:36+0000\n"
 "Last-Translator: Peter Pall <gunter@peterpall.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,12 +32,12 @@ msgstr ""
 "\n"
 "  Künstler: %s\n"
 
-#: src/cue.c:513
+#: src/cue.c:518
 #, c-format
 msgid " reading informations from CUE file %s ...\n"
 msgstr " Informationen aus CUE-Datei %s werden gelesen …\n"
 
-#: src/cue.c:587 src/cddb.c:133
+#: src/cue.c:592 src/cddb.c:133
 #, c-format
 msgid ""
 "  Tracks: %d\n"
@@ -46,7 +46,7 @@ msgstr ""
 "  Titel: %d\n"
 "\n"
 
-#: src/cue.c:810
+#: src/cue.c:815
 #, c-format
 msgid " CUE file '%s' created.\n"
 msgstr " CUE-Datei »%s« wurde erstellt.\n"
@@ -178,273 +178,321 @@ msgid " freedb error: bad response from remote host"
 msgstr ""
 
 #: src/errors.c:261
-msgid " wrap split ok"
+msgid " internal sheet error: no internal sheet or invalid sheet"
 msgstr ""
 
 #: src/errors.c:264
+msgid " internal sheet error: internal sheet type not supported"
+msgstr ""
+
+#: src/errors.c:268
+msgid " wrap split ok"
+msgstr ""
+
+#: src/errors.c:271
 msgid " wrap error: incorrect file length"
 msgstr ""
 
-#: src/errors.c:267
+#: src/errors.c:274
 msgid " wrap error: libmp3splt version too old for this wrap file"
 msgstr ""
 
-#: src/errors.c:270
+#: src/errors.c:277
 msgid " wrap error: no file found or bad index"
 msgstr ""
 
-#: src/errors.c:273
+#: src/errors.c:280
 #, c-format
 msgid " wrap error: file '%s' damaged or incomplete"
 msgstr ""
 
-#: src/errors.c:277
+#: src/errors.c:284
 msgid " wrap error: maybe not a wrapped file or wrap file damaged"
 msgstr ""
 
-#: src/errors.c:280
+#: src/errors.c:287
 msgid " file split (EOF)"
 msgstr ""
 
-#: src/errors.c:282
+#: src/errors.c:289
 msgid " no silence splitpoints found"
 msgstr ""
 
-#: src/errors.c:284
+#: src/errors.c:291
 msgid " time split ok"
 msgstr ""
 
-#: src/errors.c:286
+#: src/errors.c:293
 msgid " split in equal tracks ok"
 msgstr ""
 
-#: src/errors.c:288
+#: src/errors.c:295
 msgid " silence split ok"
 msgstr ""
 
-#: src/errors.c:290
+#: src/errors.c:297
 msgid " trim using silence split ok"
 msgstr ""
 
-#: src/errors.c:293
+#: src/errors.c:300
 msgid " file split, splitpoints bigger than length"
 msgstr ""
 
-#: src/errors.c:295
+#: src/errors.c:302
 msgid " file split"
 msgstr ""
 
-#: src/errors.c:299
+#: src/errors.c:306
 msgid " error: not enough splitpoints (<2)"
 msgstr ""
 
-#: src/errors.c:302
+#: src/errors.c:309
 #, c-format
 msgid " error: cannot open file '%s': %s"
 msgstr ""
 
-#: src/errors.c:306
+#: src/errors.c:313
 #, c-format
 msgid " error: cannot close file '%s': %s"
 msgstr ""
 
-#: src/errors.c:313
+#: src/errors.c:320
 #, c-format
 msgid " error: invalid input file '%s' for '%s' plugin"
 msgstr ""
 
-#: src/errors.c:317
+#: src/errors.c:324
 #, c-format
 msgid " error: splitpoints are equal (%s)"
 msgstr ""
 
-#: src/errors.c:320
+#: src/errors.c:327
 msgid " error: invalid time split value"
 msgstr ""
 
-#: src/errors.c:323
+#: src/errors.c:330
 msgid " error: invalid number of files for equal length split"
 msgstr ""
 
-#: src/errors.c:326
+#: src/errors.c:333
 msgid " error: cannot get total audio length"
 msgstr ""
 
-#: src/errors.c:329
+#: src/errors.c:336
 msgid " error: unknown error while setting tags with libid3"
 msgstr ""
 
-#: src/errors.c:332
+#: src/errors.c:342
 #, c-format
 msgid " error: the splitpoints are not in order (%s)"
 msgstr ""
 
-#: src/errors.c:335
+#: src/errors.c:345
 #, c-format
 msgid " error: negative splitpoint (%s)"
 msgstr ""
 
-#: src/errors.c:339
+#: src/errors.c:349
 #, c-format
 msgid " error: bad destination folder '%s' (%s)"
 msgstr ""
 
-#: src/errors.c:342
+#: src/errors.c:352
 msgid " error: incompatible options"
-msgstr ""
-
-#: src/errors.c:345
-#, c-format
-msgid " input and output are the same file ('%s')"
-msgstr ""
-
-#: src/errors.c:348
-msgid " error: cannot allocate memory"
-msgstr ""
-
-#: src/errors.c:351
-#, c-format
-msgid " error: cannot open destination file '%s': %s"
 msgstr ""
 
 #: src/errors.c:355
 #, c-format
+msgid " input and output are the same file ('%s')"
+msgstr ""
+
+#: src/errors.c:358
+msgid " error: cannot allocate memory"
+msgstr ""
+
+#: src/errors.c:361
+#, c-format
+msgid " error: cannot open destination file '%s': %s"
+msgstr ""
+
+#: src/errors.c:365
+#, c-format
 msgid " error: cannot write to output file '%s'"
 msgstr ""
 
-#: src/errors.c:359
+#: src/errors.c:369
 #, c-format
 msgid " error: error while reading file '%s': %s"
 msgstr ""
 
-#: src/errors.c:362
+#: src/errors.c:372
 #, c-format
 msgid " error: cannot seek file '%s'"
 msgstr ""
 
-#: src/errors.c:365
+#: src/errors.c:375
 msgid " error: begin point out of file"
 msgstr ""
 
-#: src/errors.c:367
+#: src/errors.c:377
 #, c-format
 msgid " error: inexistent file '%s': %s"
 msgstr ""
 
-#: src/errors.c:370
+#: src/errors.c:380
 msgid " split process cancelled"
 msgstr ""
 
-#: src/errors.c:372
+#: src/errors.c:382
 msgid " error: library locked"
 msgstr ""
 
-#: src/errors.c:375
+#: src/errors.c:385
 msgid " error: the state has not been initialized with 'mp3splt_new_state'"
 msgstr ""
 
-#: src/errors.c:377
-msgid " error: negative time split"
-msgstr ""
-
-#: src/errors.c:380
-#, c-format
-msgid " error: cannot create directory '%s'"
-msgstr ""
-
-#: src/errors.c:383
-msgid " error: no plugin found"
-msgstr ""
-
-#: src/errors.c:385
-msgid " error: cannot initiate libltdl"
-msgstr ""
-
 #: src/errors.c:387
-msgid " error: CRC failed"
+msgid " error: negative time split"
 msgstr ""
 
 #: src/errors.c:390
 #, c-format
-msgid " error: no plugin matches the file '%s'"
+msgid " error: cannot create directory '%s'"
+msgstr ""
+
+#: src/errors.c:393
+msgid " error: no plugin found"
+msgstr ""
+
+#: src/errors.c:395
+msgid " error: cannot initiate libltdl"
 msgstr ""
 
 #: src/errors.c:397
+msgid " error: CRC failed"
+msgstr ""
+
+#: src/errors.c:400
+#, c-format
+msgid " error: no plugin matches the file '%s'"
+msgstr ""
+
+#: src/errors.c:407
 msgid " warning: output format ambiguous (@t or @n missing)"
 msgstr ""
 
-#: src/errors.c:403
+#: src/errors.c:413
 #, c-format
 msgid " error: illegal variable '@%s' in output format"
 msgstr ""
 
-#: src/errors.c:408
+#: src/errors.c:418
 msgid " error: invalid output format"
 msgstr ""
 
-#: src/errors.c:412
+#: src/errors.c:422
 msgid " error: inexistent splitpoint"
 msgstr ""
 
-#: src/errors.c:415
+#: src/errors.c:425
 #, c-format
 msgid " plugin error: '%s'"
 msgstr ""
 
-#: src/errors.c:423
+#: src/errors.c:433
 #, c-format
 msgid " error: unsupported feature for the plugin '%s'"
 msgstr ""
 
-#: src/errors.c:426
+#: src/errors.c:436
 msgid " audacity labels file processed"
 msgstr ""
 
-#: src/errors.c:429
+#: src/errors.c:439
 #, c-format
 msgid " audacity error: invalid audacity labels file '%s'"
 msgstr ""
 
-#: src/errors.c:433
+#: src/errors.c:443
 #, c-format
 msgid " regular expression error: %s"
 msgstr ""
 
-#: src/errors.c:435
+#: src/errors.c:445
 msgid " regular expressions are not supported"
 msgstr ""
 
-#: src/errors.c:437
+#: src/errors.c:447
 msgid " regular expression error: no match"
 msgstr ""
 
-#: src/errors.c:439
+#: src/errors.c:449
 msgid " regular expression ok"
 msgstr ""
 
+#: src/errors.c:451
+msgid " error: one of the splitpoints has not been auto-adjusted"
+msgstr ""
+
+#: src/errors.c:453
+#, c-format
+msgid " invalid code error: '%s'"
+msgstr ""
+
+#: src/mp3splt.c:1094
+msgid ""
+" warning: bit reservoir handling for gapless playback is still experimental\n"
+msgstr ""
+
+#: src/mp3splt.c:1099
+msgid " warning: bit reservoir is not compatible with overlap option\n"
+msgstr ""
+
+#: src/mp3splt.c:1105
+msgid " warning: bit reservoir is not compatible with auto adjust option\n"
+msgstr ""
+
+#: src/mp3splt.c:1111
+msgid " warning: bit reservoir is not compatible with input not seekable\n"
+msgstr ""
+
+#: src/mp3splt.c:1124
+msgid ""
+" warning: bit reservoir is not compatible with silence detection or "
+"trimming\n"
+msgstr ""
+
+#: src/mp3splt.c:1131
+msgid " warning: bit reservoir is not compatible with 'no xing'\n"
+msgstr ""
+
 #: src/mp3splt.c:1138
+msgid " warning: please enable frame mode to make bit reservoir work\n"
+msgstr ""
+
+#: src/mp3splt.c:1191
 #, c-format
 msgid " info: resolving linked filename to '%s'\n"
 msgstr " Info: Verknüpfter Dateiname wird in »%s« aufgelöst\n"
 
-#: src/mp3splt.c:1193
+#: src/mp3splt.c:1246
 #, c-format
 msgid " info: file matches the plugin '%s'\n"
 msgstr " Info: Datei passt zum Plugin »%s«\n"
 
-#: src/mp3splt.c:1201
+#: src/mp3splt.c:1254
 #, c-format
 msgid " M3U file '%s' will be created.\n"
 msgstr " M3U-Datei »%s« wird erstellt.\n"
 
-#: src/mp3splt.c:1222
+#: src/mp3splt.c:1275
 #, c-format
 msgid ""
 " Working with SILENCE AUTO-ADJUST (Threshold: %.1f dB Gap: %d sec Offset: "
 "%.2f Min: %.2f sec)\n"
 msgstr ""
 
-#: src/mp3splt.c:1977 src/tags_parser.c:107
+#: src/mp3splt.c:2043 src/tags_parser.c:107
 msgid ""
 " warning: cannot set tags from filename regular expression - compiled "
 "without pcre support\n"
@@ -454,12 +502,17 @@ msgstr ""
 msgid "directory does not exists"
 msgstr "Ordner existiert nicht"
 
+#: src/checks.c:325
+#, c-format
+msgid " warning: detected as %s but extension does not match\n"
+msgstr ""
+
 #: src/cddb.c:63
 #, c-format
 msgid " reading informations from CDDB file %s ...\n"
 msgstr " Informationen aus CDDB-Datei %s werden gelesen …\n"
 
-#: src/string_utils.c:638 src/string_utils.c:659
+#: src/string_utils.c:659 src/string_utils.c:680
 msgid "not enough memory"
 msgstr ""
 
@@ -555,7 +608,7 @@ msgstr ""
 msgid " info: starting wrap mode split\n"
 msgstr " Info: Teilung im Wrap-Modus wird gestartet\n"
 
-#: src/split_points.c:398
+#: src/split_points.c:421
 #, c-format
 msgid " info: track too short (%ld.%ld.%ld < %ld.%ld.%ld); skipped.\n"
 msgstr ""
@@ -565,84 +618,93 @@ msgstr ""
 msgid " info: overlapping split files with %ld.%ld.%ld\n"
 msgstr " Info: Überlappung der Dateiteilung mit %ld.%ld.%ld\n"
 
-#: plugins/mp3.c:1236
+#: src/utils.c:127
+#, c-format
+msgid " warning: splitpoint %ld.%ld.%ld is not auto-adjusted\n"
+msgstr ""
+
+#: plugins/mp3.c:1268
 msgid ""
 " warning: lost sync and compiled without id3tag support - the split might be "
 "corrupt\n"
 msgstr ""
 
-#: plugins/mp3.c:1332
+#: plugins/mp3.c:1362
 msgid " info: found Xing or Info header. Switching to frame mode... \n"
 msgstr ""
 " Hinweis: Xing- oder Info-Header wurde gefunden. Wechsel zum Frame-Modus…\n"
 
-#: plugins/mp3.c:1470
+#: plugins/mp3.c:1501
 #, c-format
 msgid " info: MPEG %d Layer %d - %d Hz - %s"
 msgstr " Info: MPEG %d Layer %d - %d Hz - %s"
 
-#: plugins/mp3.c:1478
+#: plugins/mp3.c:1510
 #, c-format
 msgid " - FRAME MODE NS"
 msgstr " - FRAME-MODUS NS"
 
-#: plugins/mp3.c:1482
+#: plugins/mp3.c:1514
 #, c-format
 msgid " - FRAME MODE"
 msgstr " - FRAME-MODUS"
 
-#: plugins/mp3.c:1487
+#: plugins/mp3.c:1519
 #, c-format
 msgid " - NS - %d Kb/s"
 msgstr " - NS - %d kB/s"
 
-#: plugins/mp3.c:1492
+#: plugins/mp3.c:1524
 #, c-format
 msgid " - %d Kb/s"
 msgstr " - %d kB/s"
 
-#: plugins/mp3.c:1500 plugins/ogg.c:132 plugins/flac.c:214
+#: plugins/mp3.c:1532 plugins/ogg.c:132 plugins/flac.c:285
 #, c-format
 msgid " - Total time: %dm.%02ds"
 msgstr " - Zeit gesamt: %dm.%02ds"
 
-#: plugins/mp3.c:2823
+#: plugins/mp3.c:2930
 #, c-format
 msgid " Detected file created with: Mp3Wrap v. %c.%c\n"
 msgstr " Erkannte Datei erzeugt mit: Mp3Wrap v. %c.%c\n"
 
-#: plugins/mp3.c:2861
+#: plugins/mp3.c:2968
 msgid " Check for file integrity: calculating CRC please wait... "
 msgstr " Integritätsprüfung der Datei: CRC wird berechnet, bitte warten …"
 
-#: plugins/mp3.c:2880
+#: plugins/mp3.c:2987
 msgid " OK\n"
 msgstr " OK\n"
 
-#: plugins/mp3.c:2899
+#: plugins/mp3.c:3006
 msgid " Detected file created with: AlbumWrap\n"
 msgstr " Erkannte Datei erzeugt mit: AlbumWrap\n"
 
-#: plugins/mp3.c:2921
+#: plugins/mp3.c:3028
 #, c-format
 msgid " Total files: %d\n"
 msgstr " Dateien gesamt: %d\n"
 
-#: plugins/mp3.c:3339
+#: plugins/mp3.c:3446
 msgid " warning: stdin '-' is supposed to be mp3 stream.\n"
 msgstr " Warnung: stdin »-« wird als mp3-Datenstrom angenommen.\n"
 
-#: plugins/mp3.c:3366
+#: plugins/mp3.c:3473
 #, c-format
 msgid " Processed %lu frames - Sync errors: %lu\n"
 msgstr " %lu Frames wurden verarbeitet - Synchronisationsfehler: %lu\n"
+
+#: plugins/mp3.c:3656
+msgid " warning: overlapped chapters are not yet supported.\n"
+msgstr ""
 
 #: plugins/ogg.c:124
 #, c-format
 msgid " info: Ogg Vorbis Stream - %ld - %ld Kb/s - %d channels"
 msgstr " Info: OggVorbis-Datenstrom - %ld - %ld kB/s - %d Kanäle"
 
-#: plugins/ogg.c:1472
+#: plugins/ogg.c:1475
 msgid " warning: stdin 'o-' is supposed to be ogg stream.\n"
 msgstr " Warnung: stdin »o-« wird als Ogg-Datenstrom angenommen.\n"
 
@@ -662,7 +724,11 @@ msgstr " Info: Überlappung der Dateiteilung mit %ld.%ld.%ld\n"
 msgid " info: trim end split at %ldm_%.2lds_%.2ldh\n"
 msgstr " Info: Überlappung der Dateiteilung mit %ld.%ld.%ld\n"
 
-#: plugins/flac.c:206
+#: plugins/flac.c:245
+msgid "--- last cue splitpoint ---"
+msgstr ""
+
+#: plugins/flac.c:277
 #, c-format
 msgid " info: Native FLAC - %u Hz - %d channels of %d bits"
 msgstr ""
